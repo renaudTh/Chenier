@@ -1,0 +1,16 @@
+---
+Language:        Cpp
+BasedOnStyle:  LLVM
+AccessModifierOffset: -4
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: AllIfsAndElse
+AlwaysBreakTemplateDeclarations: Yes
+BinPackParameters: false
+ColumnLimit:     120
+PointerAlignment: Right
+IndentCaseLabels: true
+IndentWidth:     4
+Standard:        c++14
+TabWidth:        4
+UseTab:          ForIndentation
+...
