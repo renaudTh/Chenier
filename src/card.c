@@ -1,27 +1,38 @@
 
 #include "card.h"
 
-Card *card_new(Family f, int value, bool visible) {
+Card *card_new(Family f, uint8_t value, bool visible) {
 	Card *c = malloc(sizeof(Card));
-	c->f = f;
-	c->value = value;
-	c->visible = visible;
+	*c = 0U;
+	*c |= f;
+	*c |= (value << 2);
+	*c |= (visible << 7);
 	return c;
 }
-void card_flip(Card *c) {
-	c->visible = !c->visible;
+uint8_t card_value(const Card *c) {
+	return ((*c & 0x7C) >> 2);
 }
-Card *card_copy(const Card *c) {
-	return card_new(c->f, c->value, c->visible);
+Family card_family(const Card *c) {
+	return ((*c & 0x3));
+}
+bool card_is_visible(const Card *c) {
+	return ((*c & 0x80) >> 7);
+}
+void card_set_visible(Card *c, bool visible) {
+	*c &= (visible << 7);
+}
+void card_flip(Card *c) {
+	(*c) ^= (1 << 7);
 }
 void card_print(const Card *c) {
-
-	if (c->visible) printf("%02d ", c->value);
-	else printf("# ");
+	if (card_is_visible(c)) {
+		printf("%u ", card_value(c));
+	} else {
+		printf("# ");
+	}
 }
 void card_destroy(Card *c) {
-	if (c) {
-		free(c);
-		c = NULL;
-	}
+	if (!c) return;
+	free(c);
+	c = NULL;
 }
