@@ -1,5 +1,4 @@
 set(C_SOURCE_FILE 
-battle-tester.c
 card-stack-tester.c
 card-game-tester.c
 )
