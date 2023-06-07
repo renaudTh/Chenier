@@ -1,6 +1,6 @@
 set(C_SOURCE_FILE 
 card.c
 stack.c    
-battle/battle.c
+r7/r7.c
 )
 add_library(cardGames ${C_SOURCE_FILE})
