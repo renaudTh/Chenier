@@ -1,6 +1,6 @@
 set(C_SOURCE_FILE 
 card-stack-tester.c
-card-game-tester.c
+tester.c
 )
 
 add_executable(cardGameTester ${C_SOURCE_FILE})
