@@ -98,6 +98,29 @@ void stack_pop_from_top_to_top(Stack *from, Stack *to, const bool flip) {
 	}
 	to->size++;
 }
+void stack_pop_from_top_to_bottom(Stack *from, Stack *to, const bool flip) {
+	if (!from || !to) return;
+	if (stack_is_empty(from)) return;
+	Node *to_add = from->head;
+	if (flip) {
+		card_flip(to_add->card);
+	}
+	from->head = from->head->next;
+	from->head->prev = NULL;
+	from->size--;
+	if (stack_is_empty(to)) {
+		to->head = to_add;
+		to->tail = to_add;
+		to_add->prev = NULL;
+		to_add->next = NULL;
+	} else {
+		to_add->prev = to->tail;
+		to_add->next = NULL;
+		to->tail->next = to_add;
+		to->tail = to_add;
+	}
+	to->size++;
+}
 bool stack_is_empty(const Stack *s) {
 	return s->size == 0;
 }
@@ -105,6 +128,11 @@ const Card *stack_read_first(const Stack *s) {
 	if (!s) return NULL;
 	if (stack_is_empty(s)) return NULL;
 	return s->head->card;
+}
+const Card *stack_read_bottom(const Stack *s) {
+	if (!s) return NULL;
+	if (stack_is_empty(s)) return NULL;
+	return s->tail->card;
 }
 void stack_shuffle(Stack *s) {
 	if (!s) return;
