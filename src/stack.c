@@ -83,7 +83,11 @@ void stack_pop_from_top_to_top(Stack *from, Stack *to, const bool flip) {
 		card_flip(to_add->card);
 	}
 	from->head = from->head->next;
-	from->head->prev = NULL;
+	if (from->head) {
+		from->head->prev = NULL;
+	} else {
+		from->tail = NULL;
+	}
 	from->size--;
 	if (stack_is_empty(to)) {
 		to->head = to_add;
@@ -106,7 +110,11 @@ void stack_pop_from_top_to_bottom(Stack *from, Stack *to, const bool flip) {
 		card_flip(to_add->card);
 	}
 	from->head = from->head->next;
-	from->head->prev = NULL;
+	if (from->head) {
+		from->head->prev = NULL;
+	} else {
+		from->tail = NULL;
+	}
 	from->size--;
 	if (stack_is_empty(to)) {
 		to->head = to_add;
@@ -206,5 +214,4 @@ void stack_destroy(Stack *s) {
 	}
 	s->tail = NULL;
 	free(s);
-	s = NULL;
 }
