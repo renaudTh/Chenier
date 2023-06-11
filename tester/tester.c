@@ -31,6 +31,7 @@ typedef struct ChenierTester {
 	char *suite_name;
 	char *test_name;
 	CU_SuiteInfo *suites_list;
+	int nb_suites;
 
 } ChenierTester;
 
@@ -71,10 +72,16 @@ ChenierTester *chenier_tester_new(CU_SuiteInfo *suites_list) {
 }
 
 void chenier_tester_print(ChenierTester *tester) {
-
 	printf("suite : %s\ntest : %s\n", tester->suite_name, tester->test_name);
 }
+void chenier_tester_list_suites(ChenierTester *tester) {
 
+	CU_SuiteInfo *p = &tester->suites_list[0];
+	while (p->pName != NULL) {
+		printf("%s\n", p->pName);
+		p++;
+	}
+}
 void chenier_tester_run(ChenierTester *tester) {
 
 	if (tester->suite_name == NULL) {
@@ -85,6 +92,7 @@ void chenier_tester_run(ChenierTester *tester) {
 		CU_pSuite s = CU_get_suite(tester->suite_name);
 		if (!s) {
 			printf("Unable to find suite. Available suites are : \n");
+			chenier_tester_list_suites(tester);
 			return;
 		}
 		if (tester->test_name != NULL) {
