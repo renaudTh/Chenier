@@ -14,7 +14,6 @@ typedef struct GraphicContext {
 	int card_width;
 	int card_height;
 	SDL_Window *window;
-	SDL_Renderer *screen;
 	SDL_Surface *bg;
 	SDL_Surface *sprite;
 
@@ -25,16 +24,13 @@ static void graphic_context_blit_background(GraphicContext *gc) {
 	src = (SDL_Rect){
 	    .x = (gc->bg->w - gc->width) / 2, .y = (gc->bg->h - gc->height) / 2, .w = gc->width, .h = gc->height};
 	dst = (SDL_Rect){.x = 0, .y = 0, .w = gc->width, .h = gc->height};
-	SDL_Texture *texture = SDL_CreateTextureFromSurface(gc->screen, gc->bg);
-	SDL_RenderCopy(gc->screen, texture, &src, &dst);
-	SDL_RenderPresent(gc->screen);
+	SDL_BlitSurface(gc->bg, &src, SDL_GetWindowSurface(gc->window), &dst);
+	SDL_UpdateWindowSurface(gc->window);
 }
 GraphicContext *graphic_context_new(char *title, int width, int height) {
 
 	GraphicContext *gc = malloc(sizeof(GraphicContext));
-	gc->window =
-	    SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN);
-	gc->screen = SDL_CreateRenderer(gc->window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	gc->window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 0);
 	gc->width = width;
 	gc->height = height;
 	gc->bg = IMG_Load("../assets/background.jpg");
@@ -46,19 +42,16 @@ GraphicContext *graphic_context_new(char *title, int width, int height) {
 }
 
 void graphic_context_destroy(GraphicContext *gc) {
-
-	if (gc->window) {
-		SDL_DestroyWindow(gc->window);
-	}
-	if (gc->screen) {
-		SDL_DestroyRenderer(gc->screen);
-	}
 	if (gc->bg) {
 		SDL_FreeSurface(gc->bg);
 	}
 	if (gc->sprite) {
 		SDL_FreeSurface(gc->sprite);
 	}
+	if (gc->window) {
+		SDL_DestroyWindow(gc->window);
+	}
+
 	free(gc);
 }
 
@@ -121,23 +114,12 @@ void graphic_context_plot_stack(GraphicContext *gc, Stack *stack, int x, int y, 
 }
 int main() {
 
-	SDL_Window *window;
-	SDL_Renderer *screen;
-
 	SDL_VideoInit(NULL);
-	window = SDL_CreateWindow("Une fenetre SDL", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 600, 600,
-	                          SDL_WINDOW_RESIZABLE);
-	screen = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	SDL_Surface *bg = IMG_Load("../assets/background.jpg");
-	SDL_Texture *texture = SDL_CreateTextureFromSurface(screen, bg);
-	SDL_RenderCopy(screen, texture, NULL, NULL);
-	SDL_RenderPresent(screen);
-	SDL_Delay(10000);
-
-	SDL_FreeSurface(bg);
-	SDL_DestroyTexture(texture);
-	SDL_DestroyRenderer(screen);
-	SDL_DestroyWindow(window);
+	SDL_Event event;
+	GraphicContext *gc = graphic_context_new("Hello", 800, 600);
+	graphic_context_wait(gc, &event);
+	// SDL_Delay(1000);
+	graphic_context_destroy(gc);
 	SDL_VideoQuit();
 	SDL_Quit();
 	return 0;
