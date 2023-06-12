@@ -14,18 +14,23 @@ typedef struct GraphicContext {
 	int card_width;
 	int card_height;
 	SDL_Window *window;
-	SDL_Surface *bg;
-	SDL_Surface *sprite;
+	SDL_Renderer *screen;
+	SDL_Texture *bg;
+	SDL_Texture *sprite;
 
 } GraphicContext;
 
 static void graphic_context_blit_background(GraphicContext *gc) {
-	SDL_Rect dst, src;
-	src = (SDL_Rect){
-	    .x = (gc->bg->w - gc->width) / 2, .y = (gc->bg->h - gc->height) / 2, .w = gc->width, .h = gc->height};
+	SDL_Rect dst = {0}, src = {0};
+	int bgw, bgh;
+
+	SDL_QueryTexture(gc->bg, NULL, NULL, &bgw, &bgh);
+	src.x = (bgw - gc->width) / 2;
+	src.y = (bgh - gc->height) / 2;
+	src.w = gc->width;
+	src.h = gc->height;
 	dst = (SDL_Rect){.x = 0, .y = 0, .w = gc->width, .h = gc->height};
-	SDL_BlitSurface(gc->bg, &src, SDL_GetWindowSurface(gc->window), &dst);
-	SDL_UpdateWindowSurface(gc->window);
+	SDL_RenderCopy(gc->screen, gc->bg, &src, &dst);
 }
 GraphicContext *graphic_context_new(char *title, int width, int height) {
 
@@ -33,25 +38,33 @@ GraphicContext *graphic_context_new(char *title, int width, int height) {
 	gc->window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 0);
 	gc->width = width;
 	gc->height = height;
-	gc->bg = IMG_Load("../assets/background.jpg");
-	gc->sprite = IMG_Load("../assets/spriteResized.png");
-	gc->card_height = gc->sprite->h / 5;
-	gc->card_width = gc->sprite->w / 13;
+
+	gc->screen = SDL_CreateRenderer(gc->window, -1, 0);
+	SDL_Surface *background = IMG_Load("../assets/background.jpg");
+	gc->bg = SDL_CreateTextureFromSurface(gc->screen, background);
+	SDL_FreeSurface(background);
+
+	SDL_Surface *sp = IMG_Load("../assets/spriteResized.png");
+	gc->sprite = SDL_CreateTextureFromSurface(gc->screen, sp);
+	SDL_FreeSurface(sp);
+
+	SDL_QueryTexture(gc->sprite, NULL, NULL, &gc->card_width, &gc->card_height);
+	gc->card_height /= 5;
+	gc->card_width /= 13;
 	graphic_context_blit_background(gc);
 	return gc;
 }
 
 void graphic_context_destroy(GraphicContext *gc) {
 	if (gc->bg) {
-		SDL_FreeSurface(gc->bg);
+		SDL_DestroyTexture(gc->bg);
 	}
 	if (gc->sprite) {
-		SDL_FreeSurface(gc->sprite);
+		SDL_DestroyTexture(gc->sprite);
 	}
 	if (gc->window) {
 		SDL_DestroyWindow(gc->window);
 	}
-
 	free(gc);
 }
 
@@ -90,8 +103,7 @@ void graphic_context_plot_card(GraphicContext *gc, const Card *card, int x, int 
 	if (!card) return;
 	SDL_Rect src = graphic_context_get_card_rect(gc, card);
 	SDL_Rect dst = {.x = x, .y = y, .w = gc->card_width, .h = gc->card_height};
-	SDL_BlitSurface(gc->sprite, &src, SDL_GetWindowSurface(gc->window), &dst);
-	// SDL_UpdateWindowSurface(gc->window);
+	SDL_RenderCopy(gc->screen, gc->sprite, &src, &dst);
 }
 
 void graphic_context_plot_stack(GraphicContext *gc, Stack *stack, int x, int y, bool spread) {
@@ -106,12 +118,11 @@ void graphic_context_plot_stack(GraphicContext *gc, Stack *stack, int x, int y, 
 		while (runner != NULL) {
 			SDL_Rect src = graphic_context_get_card_rect(gc, runner->card);
 			SDL_Rect dst = {.x = xi, .y = yi, .w = gc->card_width, .h = gc->card_height};
-			SDL_BlitSurface(gc->sprite, &src, SDL_GetWindowSurface(gc->window), &dst);
+			SDL_RenderCopy(gc->screen, gc->sprite, &src, &dst);
 			runner = runner->prev;
 			yi += gc->card_height * 0.16;
 		}
 	}
-	SDL_UpdateWindowSurface(gc->window);
 }
 
 void r7_plot_table(GraphicContext *gc, R7Game *game) {
@@ -123,11 +134,19 @@ void r7_plot_table(GraphicContext *gc, R7Game *game) {
 }
 int main() {
 
+	IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
 	SDL_VideoInit(NULL);
 	SDL_Event event;
+
 	R7Game *rg = r7_game_new();
 	r7_game_init(rg);
 	GraphicContext *gc = graphic_context_new("Hello", 1200, 900);
+	SDL_SetRenderDrawColor(gc->screen, 0, 0, 0, 255);
+	SDL_RenderClear(gc->screen);
+	graphic_context_blit_background(gc);
+	r7_plot_table(gc, rg);
+	SDL_RenderPresent(gc->screen);
+
 	bool play = true;
 	while (SDL_WaitEvent(&event)) {
 		switch (event.type) {
@@ -147,13 +166,16 @@ int main() {
 			stack_flip(rg->bin);
 			stack_append_stack_on_tail(rg->deck, rg->bin);
 		}
-		SDL_FillRect(SDL_GetWindowSurface(gc->window), NULL, 0x000000);
+		SDL_SetRenderDrawColor(gc->screen, 0, 0, 0, 255);
+		SDL_RenderClear(gc->screen);
 		graphic_context_blit_background(gc);
 		r7_plot_table(gc, rg);
+		SDL_RenderPresent(gc->screen);
 	}
 	r7_game_destroy(rg);
 	graphic_context_destroy(gc);
 	SDL_VideoQuit();
 	SDL_Quit();
+	IMG_Quit();
 	return 0;
 }
