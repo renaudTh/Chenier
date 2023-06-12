@@ -31,6 +31,7 @@ void stack_pop_from_top_to_bottom(Stack *from, Stack *to, const bool flip);
 
 void stack_append_stack_on_tail(Stack *s, Stack *toAdd);
 void stack_set_visibility(Stack *s, const bool visibility);
+void stack_flip(Stack *s);
 void stack_print(const Stack *s);
 
 #endif // STACK_H

@@ -203,6 +203,22 @@ void stack_set_visibility(Stack *s, const bool visibility) {
 		runner = runner->next;
 	}
 }
+void stack_flip(Stack *s) {
+	if (!s) return;
+	if (stack_is_empty(s) || stack_get_size(s) == 1) return;
+	Node *runner = s->tail;
+	Node *temp = NULL;
+	while (runner != NULL) {
+		Node *temp = runner->prev;
+		runner->prev = runner->next;
+		runner->next = temp;
+		card_flip(runner->card);
+		runner = runner->next;
+	}
+	temp = s->tail;
+	s->tail = s->head;
+	s->head = temp;
+}
 void stack_destroy(Stack *s) {
 	if (!s) return;
 	Node *runner = s->head;
