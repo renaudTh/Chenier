@@ -13,12 +13,29 @@ typedef struct GraphicContext {
 	char *title;
 	int card_width;
 	int card_height;
-	SDL_Window *window;
 	SDL_Renderer *screen;
 	SDL_Texture *bg;
 	SDL_Texture *sprite;
 
 } GraphicContext;
+
+typedef bool (*game_init)(void *);
+typedef bool (*game_play_card)(void *);
+typedef void (*game_iterate)(void *);
+typedef bool (*game_ended)(void *);
+typedef bool (*game_won)(void *);
+typedef void (*game_render)(GraphicContext *, void *);
+
+typedef struct CardGame {
+	char *name;
+	void *game;
+	game_init init;
+	game_play_card play_card;
+	game_iterate iterate;
+	game_ended ended;
+	game_won won;
+	game_render render;
+} CardGame;
 
 static void graphic_context_blit_background(GraphicContext *gc) {
 	SDL_Rect dst = {0}, src = {0};
@@ -32,14 +49,15 @@ static void graphic_context_blit_background(GraphicContext *gc) {
 	dst = (SDL_Rect){.x = 0, .y = 0, .w = gc->width, .h = gc->height};
 	SDL_RenderCopy(gc->screen, gc->bg, &src, &dst);
 }
-GraphicContext *graphic_context_new(char *title, int width, int height) {
+GraphicContext *graphic_context_new(SDL_Window *window, char *title, int width, int height) {
 
 	GraphicContext *gc = malloc(sizeof(GraphicContext));
-	gc->window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 0);
+	SDL_SetWindowTitle(window, title);
+	SDL_SetWindowSize(window, width, height);
 	gc->width = width;
 	gc->height = height;
 
-	gc->screen = SDL_CreateRenderer(gc->window, -1, 0);
+	gc->screen = SDL_CreateRenderer(window, -1, 0);
 	SDL_Surface *background = IMG_Load("../assets/background.jpg");
 	gc->bg = SDL_CreateTextureFromSurface(gc->screen, background);
 	SDL_FreeSurface(background);
@@ -62,8 +80,8 @@ void graphic_context_destroy(GraphicContext *gc) {
 	if (gc->sprite) {
 		SDL_DestroyTexture(gc->sprite);
 	}
-	if (gc->window) {
-		SDL_DestroyWindow(gc->window);
+	if (gc->screen) {
+		SDL_DestroyRenderer(gc->screen);
 	}
 	free(gc);
 }
@@ -125,55 +143,91 @@ void graphic_context_plot_stack(GraphicContext *gc, Stack *stack, int x, int y, 
 	}
 }
 
-void r7_plot_table(GraphicContext *gc, R7Game *game) {
-	graphic_context_plot_stack(gc, game->deck, 0, 0, false);
-	graphic_context_plot_stack(gc, game->bin, gc->card_width + 2, 0, false);
-	for (int i = 0; i < 4; i++) {
-		graphic_context_plot_stack(gc, game->build[i], gc->card_width * (i + 1), gc->card_height + 2, true);
-	}
+void graphic_context_render(GraphicContext *ctx, game_render render_function, void *user_data) {
+	SDL_SetRenderDrawColor(ctx->screen, 0, 0, 0, 255);
+	SDL_RenderClear(ctx->screen);
+	graphic_context_blit_background(ctx);
+	render_function(ctx, user_data);
+	SDL_RenderPresent(ctx->screen);
 }
-int main() {
-
-	IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
-	SDL_VideoInit(NULL);
+void graphic_context_wait_for_click() {
 	SDL_Event event;
-
-	R7Game *rg = r7_game_new();
-	r7_game_init(rg);
-	GraphicContext *gc = graphic_context_new("Hello", 1200, 900);
-	SDL_SetRenderDrawColor(gc->screen, 0, 0, 0, 255);
-	SDL_RenderClear(gc->screen);
-	graphic_context_blit_background(gc);
-	r7_plot_table(gc, rg);
-	SDL_RenderPresent(gc->screen);
-
-	bool play = true;
 	while (SDL_WaitEvent(&event)) {
 		switch (event.type) {
 			case SDL_KEYDOWN:
-				play = r7_game_play_card(rg);
-				break;
 			case SDL_MOUSEBUTTONDOWN:
-				play = r7_game_play_card(rg);
-				break;
+				return;
 			case SDL_QUIT:
-				graphic_context_destroy(gc);
 				exit(0);
 			default:
 				continue;
 		}
-		if (!play) {
-			stack_flip(rg->bin);
-			stack_append_stack_on_tail(rg->deck, rg->bin);
-		}
-		SDL_SetRenderDrawColor(gc->screen, 0, 0, 0, 255);
-		SDL_RenderClear(gc->screen);
-		graphic_context_blit_background(gc);
-		r7_plot_table(gc, rg);
-		SDL_RenderPresent(gc->screen);
 	}
-	r7_game_destroy(rg);
-	graphic_context_destroy(gc);
+}
+void r7_game_render(GraphicContext *gc, void *game) {
+	R7Game *rg = (R7Game *)game;
+	graphic_context_plot_stack(gc, rg->deck, 0, 0, false);
+	graphic_context_plot_stack(gc, rg->bin, gc->card_width + 2, 0, false);
+	for (int i = 0; i < 4; i++) {
+		graphic_context_plot_stack(gc, rg->build[i], gc->card_width * (i + 1), gc->card_height + 2, true);
+	}
+}
+
+bool card_game_play(CardGame *cg) {
+
+	cg->init(cg->game);
+	bool play = true;
+	while (!cg->ended(cg->game)) {
+		do {
+			play = cg->play_card(cg->game);
+		} while (play);
+		cg->iterate(cg->game);
+	}
+	return cg->won(cg->game);
+}
+bool card_game_play_graphic(GraphicContext *ctx, CardGame *cg) {
+	cg->init(cg->game);
+	graphic_context_render(ctx, cg->render, cg->game);
+	bool play = true;
+	while (!cg->ended(cg->game)) {
+		do {
+
+			graphic_context_wait_for_click();
+			play = cg->play_card(cg->game);
+			graphic_context_render(ctx, cg->render, cg->game);
+
+		} while (play);
+		cg->iterate(cg->game);
+		graphic_context_render(ctx, cg->render, cg->game);
+	}
+	return cg->won(cg->game);
+}
+
+int main() {
+
+	IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
+	SDL_VideoInit(NULL);
+	SDL_Window *window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, 0);
+	GraphicContext *ctx = graphic_context_new(window, "Reussite R7", 1200, 900);
+	CardGame g = {
+	    .name = "Classical R7",
+	    .game = (R7Game *)r7_game_new(),
+	    .init = r7_init_winning_game_in_two_attempts,
+	    .ended = r7_game_ending_condition,
+	    .play_card = r7_game_play_card,
+	    .won = r7_game_winning_condition,
+	    .iterate = r7_game_iterate,
+	    .render = r7_game_render,
+	};
+	bool win = card_game_play_graphic(ctx, &g);
+	if (win) {
+		printf("YOU WON\n");
+	} else {
+		printf("YOU LOSE\n");
+	}
+	r7_game_destroy((R7Game *)g.game);
+	graphic_context_destroy(ctx);
+	SDL_DestroyWindow(window);
 	SDL_VideoQuit();
 	SDL_Quit();
 	IMG_Quit();
