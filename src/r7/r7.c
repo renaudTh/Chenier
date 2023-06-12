@@ -40,7 +40,7 @@ bool r7_game_play_card(R7Game *rg) {
 
 	if (card_to_play_value == max_value + 1) stack_pop_from_top_to_top(rg->deck, rg->build[build_index], true);
 	else if (card_to_play_value == min_value - 1) stack_pop_from_top_to_bottom(rg->deck, rg->build[build_index], true);
-	else stack_pop_from_top_to_top(rg->deck, rg->bin, false);
+	else stack_pop_from_top_to_top(rg->deck, rg->bin, true);
 
 	return true;
 }
