@@ -87,10 +87,11 @@ SDL_Rect graphic_context_get_card_rect(GraphicContext *gc, const Card *card) {
 }
 void graphic_context_plot_card(GraphicContext *gc, const Card *card, int x, int y) {
 
+	if (!card) return;
 	SDL_Rect src = graphic_context_get_card_rect(gc, card);
 	SDL_Rect dst = {.x = x, .y = y, .w = gc->card_width, .h = gc->card_height};
 	SDL_BlitSurface(gc->sprite, &src, SDL_GetWindowSurface(gc->window), &dst);
-	SDL_UpdateWindowSurface(gc->window);
+	// SDL_UpdateWindowSurface(gc->window);
 }
 
 void graphic_context_plot_stack(GraphicContext *gc, Stack *stack, int x, int y, bool spread) {
@@ -112,13 +113,45 @@ void graphic_context_plot_stack(GraphicContext *gc, Stack *stack, int x, int y, 
 	}
 	SDL_UpdateWindowSurface(gc->window);
 }
+
+void r7_plot_table(GraphicContext *gc, R7Game *game) {
+	graphic_context_plot_stack(gc, game->deck, 0, 0, false);
+	graphic_context_plot_stack(gc, game->bin, gc->card_width + 2, 0, false);
+	for (int i = 0; i < 4; i++) {
+		graphic_context_plot_stack(gc, game->build[i], gc->card_width * (i + 1), gc->card_height + 2, true);
+	}
+}
 int main() {
 
 	SDL_VideoInit(NULL);
 	SDL_Event event;
-	GraphicContext *gc = graphic_context_new("Hello", 800, 600);
-	graphic_context_wait(gc, &event);
-	// SDL_Delay(1000);
+	R7Game *rg = r7_game_new();
+	r7_game_init(rg);
+	GraphicContext *gc = graphic_context_new("Hello", 1200, 900);
+	bool play = true;
+	while (SDL_WaitEvent(&event)) {
+		switch (event.type) {
+			case SDL_KEYDOWN:
+				play = r7_game_play_card(rg);
+				break;
+			case SDL_MOUSEBUTTONDOWN:
+				play = r7_game_play_card(rg);
+				break;
+			case SDL_QUIT:
+				graphic_context_destroy(gc);
+				exit(0);
+			default:
+				continue;
+		}
+		if (!play) {
+			stack_flip(rg->bin);
+			stack_append_stack_on_tail(rg->deck, rg->bin);
+		}
+		SDL_FillRect(SDL_GetWindowSurface(gc->window), NULL, 0x000000);
+		graphic_context_blit_background(gc);
+		r7_plot_table(gc, rg);
+	}
+	r7_game_destroy(rg);
 	graphic_context_destroy(gc);
 	SDL_VideoQuit();
 	SDL_Quit();
