@@ -50,7 +50,7 @@ static void append_stack_on_tail_test(void) {
 	stack_add_card_on(s2, card_new(HEART, 11, true));
 	stack_add_card_on(s2, card_new(HEART, 12, true));
 	stack_add_card_on(s2, card_new(HEART, 13, true));
-	stack_append_stack_on_tail(s1, s2);
+	stack_append_stack_on_bottom(s1, s2);
 	CU_ASSERT_EQUAL(stack_get_size(s1), 6);
 	stack_destroy(s1);
 	stack_destroy(s2);

@@ -176,7 +176,7 @@ void stack_print(const Stack *s) {
 		runner = runner->next;
 	}
 }
-void stack_append_stack_on_tail(Stack *on, Stack *to_append) {
+void stack_append_stack_on_bottom(Stack *on, Stack *to_append) {
 
 	if (!on || !to_append) return;
 	if (stack_is_empty(to_append)) return;
@@ -188,6 +188,24 @@ void stack_append_stack_on_tail(Stack *on, Stack *to_append) {
 		on->tail->next = to_append->head;
 		to_append->head->prev = on->tail;
 		on->tail = to_append->tail;
+		on->size += to_append->size;
+	}
+	to_append->head = NULL;
+	to_append->tail = NULL;
+	to_append->size = 0;
+}
+void stack_append_stack_on_top(Stack *on, Stack *to_append) {
+
+	if (!on || !to_append) return;
+	if (stack_is_empty(to_append)) return;
+	if (stack_is_empty(on)) {
+		on->head = to_append->head;
+		on->tail = to_append->tail;
+		on->size = to_append->size;
+	} else {
+		on->head->prev = to_append->tail;
+		to_append->tail->next = on->head;
+		on->head = to_append->head;
 		on->size += to_append->size;
 	}
 	to_append->head = NULL;
