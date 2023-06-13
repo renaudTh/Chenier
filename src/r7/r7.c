@@ -1,4 +1,5 @@
 #include "r7.h"
+#include "game.h"
 
 R7Game *r7_game_new() {
 	R7Game *rg = malloc(sizeof(R7Game));
@@ -133,7 +134,23 @@ void r7_game_iterate(void *game) {
 	rg->attempt_nb++;
 	if (stack_is_empty(rg->bin)) return;
 	stack_flip(rg->bin);
-	stack_append_stack_on_tail(rg->deck, rg->bin);
+	stack_append_stack_on_bottom(rg->deck, rg->bin);
+}
+void r7_game_render(GraphicContext *gc, void *game) {
+	R7Game *rg = (R7Game *)game;
+	graphic_context_plot_stack(gc, rg->deck, 0, 0, false);
+	graphic_context_plot_stack(gc, rg->bin, gc->card_width + 2, 0, false);
+	for (int i = 0; i < 4; i++) {
+		graphic_context_plot_stack(gc, rg->build[i], gc->card_width * (i + 1), gc->card_height + 2, true);
+	}
+}
+void r7_game_destroy(R7Game *rg) {
+	if (rg->deck) stack_destroy(rg->deck);
+	if (rg->bin) stack_destroy(rg->bin);
+	for (int i = 0; i < NB_R7_BUILD_STACK; i++) {
+		if (rg->build[i]) stack_destroy(rg->build[i]);
+	}
+	free(rg);
 }
 
 bool r7_game_main_loop(R7Game *rg) {
@@ -146,11 +163,12 @@ bool r7_game_main_loop(R7Game *rg) {
 	}
 	return (rg->attempt_nb < 3);
 }
-void r7_game_destroy(R7Game *rg) {
-	if (rg->deck) stack_destroy(rg->deck);
-	if (rg->bin) stack_destroy(rg->bin);
-	for (int i = 0; i < NB_R7_BUILD_STACK; i++) {
-		if (rg->build[i]) stack_destroy(rg->build[i]);
-	}
-	free(rg);
-}
+CardGame r7_game = {
+    .name = "Classical R7",
+    .init = r7_init_winning_game_in_two_attempts,
+    .ended = r7_game_ending_condition,
+    .play_card = r7_game_play_card,
+    .won = r7_game_winning_condition,
+    .iterate = r7_game_iterate,
+    .render = r7_game_render,
+};
