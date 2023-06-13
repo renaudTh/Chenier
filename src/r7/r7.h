@@ -24,7 +24,7 @@ bool r7_game_play_card(void *game);
 bool r7_game_winning_condition(void *game);
 bool r7_game_ending_condition(void *game);
 
-void r7_game_iterate(void *game);
+bool r7_game_iterate(void *game);
 bool r7_game_main_loop(R7Game *rg);
 void r7_game_destroy(R7Game *rg);
 #endif

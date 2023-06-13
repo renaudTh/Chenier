@@ -5,7 +5,7 @@
 
 typedef bool (*game_init)(void *);
 typedef bool (*game_play_card)(void *);
-typedef void (*game_iterate)(void *);
+typedef bool (*game_iterate)(void *);
 typedef bool (*game_ended)(void *);
 typedef bool (*game_won)(void *);
 
@@ -21,6 +21,7 @@ typedef struct CardGame {
 } CardGame;
 bool card_game_play(CardGame *cg);
 bool card_game_play_graphic(GraphicContext *ctx, CardGame *cg);
+
 extern CardGame r7_game;
 
 #endif // GAME_H

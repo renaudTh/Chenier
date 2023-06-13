@@ -129,12 +129,13 @@ bool r7_game_ending_condition(void *game) {
 	R7Game *rg = (R7Game *)game;
 	return (r7_game_winning_condition(rg) || rg->attempt_nb >= 3);
 }
-void r7_game_iterate(void *game) {
+bool r7_game_iterate(void *game) {
 	R7Game *rg = (R7Game *)game;
 	rg->attempt_nb++;
-	if (stack_is_empty(rg->bin)) return;
+	if (stack_is_empty(rg->bin)) return false;
 	stack_flip(rg->bin);
 	stack_append_stack_on_bottom(rg->deck, rg->bin);
+	return false;
 }
 void r7_game_render(GraphicContext *gc, void *game) {
 	R7Game *rg = (R7Game *)game;
