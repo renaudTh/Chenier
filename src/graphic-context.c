@@ -25,7 +25,7 @@ GraphicContext *graphic_context_new(SDL_Window *window, char *title, int width, 
 	gc->bg = SDL_CreateTextureFromSurface(gc->screen, background);
 	SDL_FreeSurface(background);
 
-	SDL_Surface *sp = IMG_Load("../assets/spriteResized.png");
+	SDL_Surface *sp = IMG_Load("../assets/resizehalf.png");
 	gc->sprite = SDL_CreateTextureFromSurface(gc->screen, sp);
 	SDL_FreeSurface(sp);
 

@@ -1,7 +1,7 @@
 #ifndef R7_H
 #define R7_H
 
-#include "../stack.h"
+#include "stack.h"
 
 #define NB_R7_BUILD_STACK 4
 typedef struct R7Game_t {
