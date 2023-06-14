@@ -22,10 +22,10 @@ GraphicContext *graphic_context_new(SDL_Window *window, char *title, int width, 
 	gc->height = height;
 
 	gc->screen = SDL_CreateRenderer(window, -1, 0);
-	SDL_Surface *background = IMG_Load("../assets/background.jpg");
-	gc->bg = SDL_CreateTextureFromSurface(gc->screen, background);
-	SDL_FreeSurface(background);
-
+	gc->bg = IMG_LoadTexture(gc->screen, "../assets/background.jpg");
+	if (!gc->bg) {
+		fprintf(stderr, "%s", IMG_GetError());
+	}
 	SDL_Surface *sp = IMG_Load("../assets/spriteResized.png");
 	gc->sprite = SDL_CreateTextureFromSurface(gc->screen, sp);
 	SDL_FreeSurface(sp);
