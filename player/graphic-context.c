@@ -26,7 +26,7 @@ GraphicContext *graphic_context_new(SDL_Window *window, char *title, int width, 
 	gc->bg = SDL_CreateTextureFromSurface(gc->screen, background);
 	SDL_FreeSurface(background);
 
-	SDL_Surface *sp = IMG_Load("../assets/resize20.png");
+	SDL_Surface *sp = IMG_Load("../assets/spriteResized.png");
 	gc->sprite = SDL_CreateTextureFromSurface(gc->screen, sp);
 	SDL_FreeSurface(sp);
 
@@ -130,5 +130,6 @@ bool graphic_context_play_card_game(GraphicContext *ctx, CardGame *cg, render_fc
 			}
 		} while (res.iterate);
 	}
+	graphic_context_wait_for_click();
 	return cg->won(cg->game);
 }

@@ -1,3 +1,4 @@
+#include "c4/c4.h"
 #include "game.h"
 #include "graphic-context.h"
 #include "player.h"
@@ -25,5 +26,14 @@ void r7_game_render(GraphicContext *gc, void *game) {
 	graphic_context_plot_stack(gc, rg->bin, gc->card_width + 2, 0, false);
 	for (int i = 0; i < 4; i++) {
 		graphic_context_plot_stack(gc, rg->build[i], gc->card_width * (i + 1), gc->card_height + 2, true);
+	}
+}
+void c4_game_render(GraphicContext *ctx, void *game) {
+	C4Game *cg = (C4Game *)game;
+	int x0 = (ctx->width - 4 * ctx->card_width) / 2;
+	int y0 = (ctx->height - (8 * 0.16 + 1) * ctx->card_height) / 2;
+	for (int i = 0; i < 4; i++) {
+		graphic_context_plot_stack(ctx, cg->build[i], x0, y0, true);
+		x0 += ctx->card_width;
 	}
 }
