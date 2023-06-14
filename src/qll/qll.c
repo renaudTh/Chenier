@@ -25,11 +25,16 @@ static Stack *qll_middle_stack(QllGame *qg) {
 static Stack *qll_left_stack(QllGame *qg) {
 	return qg->table[qg->line_size - 3];
 }
-bool qll_game_init(void *game) {
+
+/* Winning game */
+bool qll_game_winning_init(void *game) {
 	QllGame *qg = (QllGame *)game;
-	for (int f = 0; f < 4; f++) {
-		for (int v = 14; v >= 7; v--) {
-			stack_add_card_on(qg->deck, card_new(f, v, false));
+
+	int color;
+	for (int v = 14; v >= 7; v--) {
+		color = 2 * (v % 2);
+		for (int f = 0; f < 4; f++) {
+			stack_add_card_on(qg->deck, card_new((color + f) % 4, v, false));
 		}
 	}
 	for (int i = 0; i < 2; i++) {
@@ -38,15 +43,37 @@ bool qll_game_init(void *game) {
 	}
 	return true;
 }
-bool qll_game_play_card(void *game) {
+/* (Loving you is a) Losing game*/
+bool qll_game_losing_init(void *game) {
 	QllGame *qg = (QllGame *)game;
+	int new_f;
+	unsigned j = 0;
+	for (int f = 0; f < 4; f++) {
+		for (int v = 14; v >= 7; v--) {
+			new_f = ((f + v + (2 * j)) % 4);
+			stack_add_card_on(qg->deck, card_new(new_f, v, false));
+		}
+		j++;
+	}
+	for (int i = 0; i < 2; i++) {
+		qll_push_stack_to_line(qg);
+		stack_pop_from_top_to_top(qg->deck, qg->table[qg->line_size - 1], true);
+	}
+	return true;
+}
+GameActionResult qll_game_play_card(void *game) {
+	QllGame *qg = (QllGame *)game;
+	GameActionResult res = {.iterate = false, .stateChanged = true};
 	qll_push_stack_to_line(qg);
 	stack_pop_from_top_to_top(qg->deck, qg->table[qg->line_size - 1], true);
-	return false;
+	return res;
 }
-bool qll_game_iterate(void *game) {
+GameActionResult qll_game_iterate(void *game) {
 	QllGame *qg = (QllGame *)game;
-	if (qg->line_size <= 2) return false;
+	GameActionResult res = {0};
+	if (qg->line_size <= 2) {
+		return res;
+	}
 	const Card *left = stack_read_first(qll_left_stack(qg));
 	const Card *right = stack_read_first(qll_right_stack(qg));
 
@@ -55,9 +82,11 @@ bool qll_game_iterate(void *game) {
 		stack_append_stack_on_top(qll_middle_stack(qg), qll_right_stack(qg));
 		stack_destroy(qll_right_stack(qg));
 		qg->line_size--;
-		return true;
+		res.iterate = true;
+		res.stateChanged = true;
+		return res;
 	}
-	return false;
+	return res;
 }
 bool qll_game_ended(void *game) {
 	QllGame *qg = (QllGame *)game;
@@ -96,7 +125,7 @@ void qll_game_destroy(void *game) {
 }
 CardGame qll_game = {
     .name = "The QLL",
-    .init = qll_game_init,
+    .init = qll_game_winning_init,
     .ended = qll_game_ended,
     .play_card = qll_game_play_card,
     .won = qll_game_won,

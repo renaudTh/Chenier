@@ -8,6 +8,7 @@
 #include "game.h"
 #include "graphic-context.h"
 #include <qll/qll.h>
+#include <r7/r7.h>
 
 int main() {
 
@@ -18,7 +19,7 @@ int main() {
 	CardGame g = qll_game;
 	g.game = (QllGame *)qll_game_new(52);
 
-	GraphicContext *ctx = graphic_context_new(window, g.name, 800, 600);
+	GraphicContext *ctx = graphic_context_new(window, g.name, 1200, 600);
 
 	bool win = card_game_play_graphic(ctx, &g);
 	if (win) {

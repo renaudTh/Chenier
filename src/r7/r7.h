@@ -1,6 +1,6 @@
 #ifndef R7_H
 #define R7_H
-
+#include "game.h"
 #include "stack.h"
 
 #define NB_R7_BUILD_STACK 4
@@ -20,11 +20,10 @@ void r7_init_losing_game(R7Game *rg);
 bool r7_init_winning_game_in_two_attempts(void *game);
 
 bool r7_game_init(void *game);
-bool r7_game_play_card(void *game);
+GameActionResult r7_game_play_card(void *game);
 bool r7_game_winning_condition(void *game);
 bool r7_game_ending_condition(void *game);
-
-bool r7_game_iterate(void *game);
+GameActionResult r7_game_iterate(void *game);
 bool r7_game_main_loop(R7Game *rg);
 void r7_game_destroy(R7Game *rg);
 #endif

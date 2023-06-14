@@ -5,36 +5,36 @@
 bool card_game_play(CardGame *cg) {
 
 	cg->init(cg->game);
-	bool play = true;
-	bool iter = true;
+	GameActionResult res = {0};
 	while (!cg->ended(cg->game)) {
 		do {
-			play = cg->play_card(cg->game);
-		} while (play);
+			res = cg->play_card(cg->game);
+		} while (res.iterate);
 		do {
-			iter = cg->iterate(cg->game);
-		} while (iter);
+			res = cg->iterate(cg->game);
+		} while (res.iterate);
 	}
 	return cg->won(cg->game);
 }
 bool card_game_play_graphic(GraphicContext *ctx, CardGame *cg) {
 	cg->init(cg->game);
 	graphic_context_render(ctx, cg->render, cg->game);
-	bool play = true;
-	bool iter = false;
+	GameActionResult res = {0};
 	while (!cg->ended(cg->game)) {
 		do {
-			graphic_context_wait_for_click();
-			play = cg->play_card(cg->game);
-			graphic_context_render(ctx, cg->render, cg->game);
-		} while (play);
-
+			res = cg->play_card(cg->game);
+			if (res.stateChanged) {
+				graphic_context_wait_for_click();
+				graphic_context_render(ctx, cg->render, cg->game);
+			}
+		} while (res.iterate);
 		do {
-			graphic_context_wait_for_click();
-			iter = cg->iterate(cg->game);
-			graphic_context_render(ctx, cg->render, cg->game);
-
-		} while (iter);
+			res = cg->iterate(cg->game);
+			if (res.stateChanged) {
+				graphic_context_wait_for_click();
+				graphic_context_render(ctx, cg->render, cg->game);
+			}
+		} while (res.iterate);
 	}
 	return cg->won(cg->game);
 }

@@ -96,10 +96,16 @@ bool r7_init_winning_game_in_two_attempts(void *game) {
 	}
 	return true;
 }
-bool r7_game_play_card(void *game) {
+GameActionResult r7_game_play_card(void *game) {
 
 	R7Game *rg = (R7Game *)game;
-	if (stack_is_empty(rg->deck)) return false;
+	GameActionResult res = {0};
+
+	if (stack_is_empty(rg->deck)) {
+		res.iterate = false;
+		res.stateChanged = false;
+		return res;
+	}
 	const Card *card_to_play = stack_read_first(rg->deck);
 
 	uint8_t card_to_play_value = card_value(card_to_play);
@@ -114,8 +120,9 @@ bool r7_game_play_card(void *game) {
 	if (card_to_play_value == max_value + 1) stack_pop_from_top_to_top(rg->deck, rg->build[build_index], true);
 	else if (card_to_play_value == min_value - 1) stack_pop_from_top_to_bottom(rg->deck, rg->build[build_index], true);
 	else stack_pop_from_top_to_top(rg->deck, rg->bin, true);
-
-	return true;
+	res.iterate = true;
+	res.stateChanged = true;
+	return res;
 }
 bool r7_game_winning_condition(void *game) {
 	R7Game *rg = (R7Game *)game;
@@ -129,13 +136,19 @@ bool r7_game_ending_condition(void *game) {
 	R7Game *rg = (R7Game *)game;
 	return (r7_game_winning_condition(rg) || rg->attempt_nb >= 3);
 }
-bool r7_game_iterate(void *game) {
+GameActionResult r7_game_iterate(void *game) {
 	R7Game *rg = (R7Game *)game;
+	GameActionResult res = {0};
 	rg->attempt_nb++;
-	if (stack_is_empty(rg->bin)) return false;
+	res.iterate = 0;
+	if (stack_is_empty(rg->bin)) {
+		res.stateChanged = 0;
+		return res;
+	}
+	res.stateChanged = 1;
 	stack_flip(rg->bin);
 	stack_append_stack_on_bottom(rg->deck, rg->bin);
-	return false;
+	return res;
 }
 void r7_game_render(GraphicContext *gc, void *game) {
 	R7Game *rg = (R7Game *)game;
@@ -155,11 +168,12 @@ void r7_game_destroy(R7Game *rg) {
 }
 
 bool r7_game_main_loop(R7Game *rg) {
-	bool play = true;
+
+	GameActionResult res = {0};
 	while (!r7_game_ending_condition(rg)) {
 		do {
-			play = r7_game_play_card(rg);
-		} while (play);
+			res = r7_game_play_card(rg);
+		} while (res.iterate);
 		r7_game_iterate(rg);
 	}
 	return (rg->attempt_nb < 3);

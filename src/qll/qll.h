@@ -1,6 +1,7 @@
 #ifndef QLL_H
 #define QLL_H
 
+#include "game.h"
 #include "graphic-context.h"
 #include "stack.h"
 #include <stdlib.h>
@@ -14,9 +15,10 @@ typedef struct QllGame {
 } QllGame;
 
 QllGame *qll_game_new(int nb_cards);
-bool qll_game_init(void *game);
-bool qll_game_play_card(void *game);
-bool qll_game_iterate(void *game);
+bool qll_game_winning_init(void *game);
+bool qll_game_losing_init(void *game);
+GameActionResult qll_game_play_card(void *game);
+GameActionResult qll_game_iterate(void *game);
 bool qll_game_ended(void *game);
 bool qll_game_won(void *game);
 void qll_game_render(GraphicContext *ctx, void *game);

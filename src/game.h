@@ -3,9 +3,14 @@
 
 #include "graphic-context.h"
 
+typedef struct GameActionResult {
+	uint8_t stateChanged : 1;
+	uint8_t iterate : 1;
+} GameActionResult;
+
 typedef bool (*game_init)(void *);
-typedef bool (*game_play_card)(void *);
-typedef bool (*game_iterate)(void *);
+typedef GameActionResult (*game_play_card)(void *);
+typedef GameActionResult (*game_iterate)(void *);
 typedef bool (*game_ended)(void *);
 typedef bool (*game_won)(void *);
 
