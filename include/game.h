@@ -1,7 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "graphic-context.h"
+#include <inttypes.h>
+#include <stdbool.h>
 
 typedef struct GameActionResult {
 	uint8_t stateChanged : 1;
@@ -22,7 +23,6 @@ typedef struct CardGame {
 	game_iterate iterate;
 	game_ended ended;
 	game_won won;
-	render_fct render;
 } CardGame;
 
 typedef enum CardGameType {
@@ -30,9 +30,7 @@ typedef enum CardGameType {
 	CardGameTypeQLL,
 } CardGameType;
 
-CardGame card_game_new(CardGameType type);
 bool card_game_play(CardGame *cg);
-bool card_game_play_graphic(GraphicContext *ctx, CardGame *cg);
 
 extern CardGame r7_game;
 extern CardGame qll_game;

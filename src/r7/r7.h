@@ -1,5 +1,6 @@
 #ifndef R7_H
 #define R7_H
+
 #include "game.h"
 #include "stack.h"
 
@@ -16,7 +17,7 @@ R7Game *r7_game_new();
 
 void r7_init_without_deck(R7Game *rg);
 bool r7_init_winning_game_in_one_attempt(void *game);
-void r7_init_losing_game(R7Game *rg);
+bool r7_init_losing_game(void *game);
 bool r7_init_winning_game_in_two_attempts(void *game);
 
 bool r7_game_init(void *game);

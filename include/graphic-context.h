@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
+#include "game.h"
 #include "stack.h"
 
 typedef struct GraphicContext {
@@ -29,4 +30,5 @@ void graphic_context_plot_stack(GraphicContext *gc, Stack *stack, int x, int y, 
 void graphic_context_render(GraphicContext *ctx, render_fct render_function, void *user_data);
 void graphic_context_wait_for_click();
 
+bool graphic_context_play_card_game(GraphicContext *ctx, CardGame *cg, render_fct game_render);
 #endif // GRAPHIC_CONTEXT_H

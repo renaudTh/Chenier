@@ -1,5 +1,4 @@
 #include "qll.h"
-#include "game.h"
 
 QllGame *qll_game_new(int nb_cards) {
 	QllGame *qg = malloc(sizeof(QllGame));
@@ -96,20 +95,7 @@ bool qll_game_won(void *game) {
 	QllGame *qg = (QllGame *)game;
 	return ((stack_is_empty(qg->deck)) && (qg->line_size == 2));
 }
-void qll_game_render(GraphicContext *ctx, void *game) {
-	QllGame *qg = (QllGame *)game;
-	graphic_context_plot_stack(ctx, qg->deck, 0, 0, false);
-	int x = 0;
-	int y = ctx->card_height;
-	for (int i = 0; i < qg->line_size; i++) {
-		graphic_context_plot_stack(ctx, qg->table[i], x, y, false);
-		x += ctx->card_width;
-		if (x > ctx->width) {
-			x = 0;
-			y += ctx->card_height;
-		}
-	}
-}
+
 void qll_game_destroy(void *game) {
 	QllGame *qg = (QllGame *)game;
 	if (qg->deck) {
@@ -123,12 +109,3 @@ void qll_game_destroy(void *game) {
 	}
 	free(qg);
 }
-CardGame qll_game = {
-    .name = "The QLL",
-    .init = qll_game_winning_init,
-    .ended = qll_game_ended,
-    .play_card = qll_game_play_card,
-    .won = qll_game_won,
-    .iterate = qll_game_iterate,
-    .render = qll_game_render,
-};

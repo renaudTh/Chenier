@@ -1,4 +1,5 @@
 #include "graphic-context.h"
+#include "game.h"
 
 static void graphic_context_blit_background(GraphicContext *gc) {
 	SDL_Rect dst = {0}, src = {0};
@@ -108,4 +109,26 @@ void graphic_context_wait_for_click() {
 				continue;
 		}
 	}
+}
+bool graphic_context_play_card_game(GraphicContext *ctx, CardGame *cg, render_fct game_render) {
+	cg->init(cg->game);
+	graphic_context_render(ctx, game_render, cg->game);
+	GameActionResult res = {0};
+	while (!cg->ended(cg->game)) {
+		do {
+			res = cg->play_card(cg->game);
+			if (res.stateChanged) {
+				graphic_context_wait_for_click();
+				graphic_context_render(ctx, game_render, cg->game);
+			}
+		} while (res.iterate);
+		do {
+			res = cg->iterate(cg->game);
+			if (res.stateChanged) {
+				graphic_context_wait_for_click();
+				graphic_context_render(ctx, game_render, cg->game);
+			}
+		} while (res.iterate);
+	}
+	return cg->won(cg->game);
 }
