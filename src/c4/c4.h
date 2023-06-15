@@ -20,4 +20,5 @@ bool c4_game_ending_condition(void *game);
 GameActionResult c4_game_iterate(void *game);
 void c4_game_destroy(C4Game *cg);
 
+extern CardGame c4_normal;
 #endif // C4_H

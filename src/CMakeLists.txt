@@ -5,6 +5,7 @@ game.c
 r7/r7.c
 qll/qll.c
 c4/c4.c
+parser/parser.c
 )
 
 add_library(cardGames ${C_SOURCE_FILE})

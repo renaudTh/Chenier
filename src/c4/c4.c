@@ -78,3 +78,12 @@ void c4_game_destroy(C4Game *cg) {
 	}
 	free(cg);
 }
+CardGame c4_normal = {
+    .ended = c4_game_ending_condition,
+    .init = c4_game_init,
+    .iterate = c4_game_iterate,
+    .name = "C4 Game",
+    .play_card = c4_game_play_card,
+    .won = c4_game_winning_condition,
+    .type = CardGameTypeC4,
+};

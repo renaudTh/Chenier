@@ -109,3 +109,22 @@ void qll_game_destroy(void *game) {
 	}
 	free(qg);
 }
+
+CardGame qll_win = {
+    .ended = qll_game_ended,
+    .init = qll_game_winning_init,
+    .iterate = qll_game_iterate,
+    .name = "The absolutely winning QLL",
+    .play_card = qll_game_play_card,
+    .won = qll_game_won,
+    .type = CardGameTypeQLL,
+};
+CardGame qll_lose = {
+    .ended = qll_game_ended,
+    .init = qll_game_losing_init,
+    .iterate = qll_game_iterate,
+    .name = "The absolutely losing QLL",
+    .play_card = qll_game_play_card,
+    .won = qll_game_won,
+    .type = CardGameTypeQLL,
+};

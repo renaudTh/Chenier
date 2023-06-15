@@ -172,3 +172,31 @@ bool r7_game_main_loop(R7Game *rg) {
 	}
 	return (rg->attempt_nb < 3);
 }
+
+CardGame r7_winning = {
+    .ended = r7_game_ending_condition,
+    .init = r7_init_winning_game_in_one_attempt,
+    .iterate = r7_game_iterate,
+    .name = "R7 game winning in one",
+    .play_card = r7_game_play_card,
+    .won = r7_game_winning_condition,
+    .type = CardGameTypeR7,
+};
+CardGame r7_losing = {
+    .ended = r7_game_ending_condition,
+    .init = r7_init_losing_game,
+    .iterate = r7_game_iterate,
+    .name = "R7 game losing",
+    .play_card = r7_game_play_card,
+    .won = r7_game_winning_condition,
+    .type = CardGameTypeR7,
+};
+CardGame r7_normal = {
+    .ended = r7_game_ending_condition,
+    .init = r7_game_init,
+    .iterate = r7_game_iterate,
+    .name = "R7 game normal",
+    .play_card = r7_game_play_card,
+    .won = r7_game_winning_condition,
+    .type = CardGameTypeR7,
+};

@@ -21,4 +21,8 @@ GameActionResult qll_game_iterate(void *game);
 bool qll_game_ended(void *game);
 bool qll_game_won(void *game);
 void qll_game_destroy(void *game);
+
+extern CardGame qll_win;
+extern CardGame qll_lose;
+
 #endif // QLL_H
