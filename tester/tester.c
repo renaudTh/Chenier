@@ -5,27 +5,6 @@
 
 #include "tester.h"
 
-typedef enum ParseStatus {
-	PARSING_OK,
-	UNKNOWN_COMMAND,
-	MISSING_VALUE,
-} ParseStatus;
-
-#define CHECK_ARGS(id, argc)                                                                                           \
-	if (id + 1 >= argc) return MISSING_VALUE;
-
-void tester_parse_log(ParseStatus status, char *value) {
-	switch (status) {
-		case MISSING_VALUE:
-			printf("Missing value for option '%s'\n", value);
-			break;
-		case UNKNOWN_COMMAND:
-			printf("error : unknown command '%s'\n", value);
-			break;
-		default:
-			break;
-	}
-}
 typedef struct ChenierTester {
 
 	char *suite_name;
@@ -35,8 +14,8 @@ typedef struct ChenierTester {
 
 } ChenierTester;
 
-ParseStatus tester_parse_arg(int argc, char *argv[], int *i, ChenierTester *tester) {
-
+ChenierParseStatus tester_parse_arg(int argc, char *argv[], int *i, void *user_data) {
+	ChenierTester *tester = (ChenierTester *)user_data;
 	if (strcmp(argv[*i], "--suite") == 0) {
 		CHECK_ARGS(*i, argc);
 		*i += 1;
@@ -46,21 +25,9 @@ ParseStatus tester_parse_arg(int argc, char *argv[], int *i, ChenierTester *test
 		*i += 1;
 		tester->test_name = argv[*i];
 	} else {
-		return UNKNOWN_COMMAND;
+		return ChenierParseStatus_UNKNOWN_COMMAND;
 	}
-	return PARSING_OK;
-}
-ParseStatus tester_parse_all(ChenierTester *tester, int argc, char *argv[]) {
-
-	ParseStatus ret;
-	int i = 1;
-	if (i + 1 > argc) return PARSING_OK;
-	do {
-		ret = tester_parse_arg(argc, argv, &i, tester);
-		tester_parse_log(ret, argv[i]);
-		i++;
-	} while (i < argc && ret == PARSING_OK);
-	return ret;
+	return ChenierParseStatus_PARSING_OK;
 }
 
 ChenierTester *chenier_tester_new(CU_SuiteInfo *suites_list) {
@@ -82,6 +49,14 @@ void chenier_tester_list_suites(ChenierTester *tester) {
 		p++;
 	}
 }
+void chenier_tester_list_tests(CU_pSuite suite) {
+	if (!suite) return;
+	CU_pTest test = suite->pTest;
+	while (test != NULL) {
+		printf("%s\n", test->pName);
+		test = test->pNext;
+	}
+}
 void chenier_tester_run(ChenierTester *tester) {
 
 	if (tester->suite_name == NULL) {
@@ -100,6 +75,7 @@ void chenier_tester_run(ChenierTester *tester) {
 			CU_pTest t = CU_get_test_by_name(tester->test_name, s);
 			if (!t) {
 				printf("Unable to find test. Available tests are : \n");
+				chenier_tester_list_tests(s);
 				return;
 			}
 			CU_basic_run_test(s, t);
@@ -120,8 +96,9 @@ int main(int argc, char *argv[]) {
 	};
 	CU_register_suites(suites);
 	ChenierTester *tester = chenier_tester_new(suites);
-	tester_parse_all(tester, argc, argv);
-	chenier_tester_run(tester);
+	ChenierParser parser = {.argc = argc, .argv = argv, .parse = tester_parse_arg, .user_data = tester};
+	ChenierParseStatus s = chenier_parser_parse(&parser);
+	if (s == ChenierParseStatus_PARSING_OK) chenier_tester_run(tester);
 	CU_cleanup_registry();
 	return 0;
 }

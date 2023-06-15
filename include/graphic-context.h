@@ -31,4 +31,5 @@ void graphic_context_render(GraphicContext *ctx, render_fct render_function, voi
 void graphic_context_wait_for_click();
 
 bool graphic_context_play_card_game(GraphicContext *ctx, CardGame *cg, render_fct game_render);
+
 #endif // GRAPHIC_CONTEXT_H

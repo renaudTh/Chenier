@@ -1,6 +1,7 @@
 #ifndef CARD_GAME_TESTER_H
 #define CARD_GAME_TESTER_H
 
+#include "parser.h"
 #include <CUnit/CUnit.h>
 
 extern CU_SuiteInfo card_stack_suite;

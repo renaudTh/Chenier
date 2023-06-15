@@ -4,22 +4,6 @@
 #include <qll/qll.h>
 #include <r7/r7.h>
 
-#define MAX_GAME_PLAYER 100
-
-typedef struct ChenierGame {
-	CardGame *game;
-	render_fct render;
-} ChenierGame;
-
-typedef struct ChenierPlayer {
-
-	ChenierGame *game_registry[MAX_GAME_PLAYER];
-	int registry_size;
-	char *game_name;
-	int replay;
-	bool enable_graphic;
-} ChenierPlayer;
-
 ChenierPlayer *chenier_player_new() {
 
 	ChenierPlayer *player = malloc(sizeof(ChenierPlayer));

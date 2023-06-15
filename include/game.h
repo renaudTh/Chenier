@@ -15,9 +15,16 @@ typedef GameActionResult (*game_iterate)(void *);
 typedef bool (*game_ended)(void *);
 typedef bool (*game_won)(void *);
 
+typedef enum CardGameType {
+	CardGameTypeR7,
+	CardGameTypeQLL,
+	CardGameTypeC4,
+} CardGameType;
+
 typedef struct CardGame {
 	char *name;
 	void *game;
+	CardGameType type;
 	game_init init;
 	game_play_card play_card;
 	game_iterate iterate;
@@ -25,14 +32,8 @@ typedef struct CardGame {
 	game_won won;
 } CardGame;
 
-typedef enum CardGameType {
-	CardGameTypeR7,
-	CardGameTypeQLL,
-} CardGameType;
-
 bool card_game_play(CardGame *cg);
-
-extern CardGame r7_game;
-extern CardGame qll_game;
+void card_game_new(CardGame *game);
+void card_game_destroy(CardGame *game);
 
 #endif // GAME_H
