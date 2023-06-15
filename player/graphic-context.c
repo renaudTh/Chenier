@@ -22,13 +22,18 @@ GraphicContext *graphic_context_new(SDL_Window *window, char *title, int width, 
 	gc->height = height;
 
 	gc->screen = SDL_CreateRenderer(window, -1, 0);
-	gc->bg = IMG_LoadTexture(gc->screen, "../assets/background.jpg");
+	char *basepath = SDL_GetBasePath();
+	char backPath[150];
+	strcpy(backPath, basepath);
+	strcat(backPath, "assets/background.jpg");
+	gc->bg = IMG_LoadTexture(gc->screen, backPath);
 	if (!gc->bg) {
 		fprintf(stderr, "%s", IMG_GetError());
 	}
-	SDL_Surface *sp = IMG_Load("../assets/spriteResized.png");
-	gc->sprite = SDL_CreateTextureFromSurface(gc->screen, sp);
-	SDL_FreeSurface(sp);
+	char spritePath[150];
+	strcpy(spritePath, basepath);
+	strcat(spritePath, "assets/spriteResized.png");
+	gc->sprite = IMG_LoadTexture(gc->screen, spritePath);
 
 	SDL_QueryTexture(gc->sprite, NULL, NULL, &gc->card_width, &gc->card_height);
 	gc->card_height /= 5;
