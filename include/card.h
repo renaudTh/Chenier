@@ -14,8 +14,9 @@ typedef enum Family_t {
 
 	CUBE = 0,
 	DIAMOND = 1,
-	HEART = 2,
-	SPADE = 3
+	SPADE = 2,
+	HEART = 3,
+
 } Family;
 typedef int PlayerId;
 typedef unsigned char uint8_t;
