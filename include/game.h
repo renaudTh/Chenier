@@ -19,6 +19,7 @@ typedef enum CardGameType {
 	CardGameTypeR7,
 	CardGameTypeQLL,
 	CardGameTypeC4,
+	CardGameTypeUpDown,
 } CardGameType;
 
 typedef struct CardGame {

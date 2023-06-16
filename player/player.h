@@ -19,5 +19,5 @@ typedef struct ChenierPlayer {
 void r7_game_render(GraphicContext *gc, void *game);
 void qll_game_render(GraphicContext *ctx, void *game);
 void c4_game_render(GraphicContext *ctx, void *game);
-
+void up_down_game_render(GraphicContext *ctx, void *game);
 #endif // PLAYER_H

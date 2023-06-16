@@ -4,7 +4,7 @@
 #include "player.h"
 #include "qll/qll.h"
 #include "r7/r7.h"
-
+#include "up-down/up-down.h"
 void qll_game_render(GraphicContext *ctx, void *game) {
 	QllGame *qg = (QllGame *)game;
 	graphic_context_plot_stack(ctx, qg->deck, 0, 0, false);
@@ -35,5 +35,20 @@ void c4_game_render(GraphicContext *ctx, void *game) {
 	for (int i = 0; i < 4; i++) {
 		graphic_context_plot_stack(ctx, cg->build[i], x0, y0, true);
 		x0 += ctx->card_width;
+	}
+}
+void up_down_game_render(GraphicContext *ctx, void *game) {
+	UpDownGame *udg = (UpDownGame *)game;
+
+	graphic_context_plot_stack(ctx, udg->deck, 0, 0, false);
+
+	int x = 2 * ctx->card_width;
+	int y = 0;
+	for (int i = 0; i < 4; i++) {
+		graphic_context_plot_stack(ctx, udg->stock[i], x, y, false);
+		y += 1.2 * ctx->card_height;
+		graphic_context_plot_stack(ctx, udg->build[i], x, y, true);
+		x += ctx->card_width;
+		y -= 1.2 * ctx->card_height;
 	}
 }

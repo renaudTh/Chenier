@@ -3,6 +3,7 @@
 #include <c4/c4.h>
 #include <qll/qll.h>
 #include <r7/r7.h>
+#include <up-down/up-down.h>
 
 ChenierPlayer *chenier_player_new() {
 
@@ -88,6 +89,7 @@ int main(int argc, char **argv) {
 	chenier_player_register_game(player, &qll_win, qll_game_render);
 	chenier_player_register_game(player, &qll_lose, qll_game_render);
 	chenier_player_register_game(player, &c4_normal, c4_game_render);
+	chenier_player_register_game(player, &up_down_winning, up_down_game_render);
 
 	ChenierParser parser = {.argc = argc, .argv = argv, .parse = chenier_player_parse_arg, .user_data = player};
 	ChenierParseStatus res = chenier_parser_parse(&parser);
