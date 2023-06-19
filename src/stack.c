@@ -249,3 +249,20 @@ void stack_destroy(Stack *s) {
 	s->tail = NULL;
 	free(s);
 }
+
+StackIterator *stack_begin(const Stack *s) {
+	if (!s) return NULL;
+	return s->head;
+}
+StackIterator *stack_end(const Stack *s) {
+	if (!s) return NULL;
+	return s->tail->next;
+}
+StackIterator *stack_next(const StackIterator *it) {
+	if (!it) return NULL;
+	return it->next;
+}
+StackIterator *stack_prev(const StackIterator *it) {
+	if (!it) return NULL;
+	return it->prev;
+}
