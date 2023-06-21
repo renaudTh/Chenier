@@ -6,5 +6,5 @@
 
 extern CU_SuiteInfo card_stack_suite;
 extern CU_SuiteInfo r7_suite;
-
+extern CU_SuiteInfo klondike_suite;
 #endif // CARD_GAME_TESTER_H

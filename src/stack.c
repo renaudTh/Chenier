@@ -40,15 +40,15 @@ void stack_add_card_under(Stack *s, Card *c) {
 	}
 	s->size++;
 }
-Stack *stack_create_complete_deck(int card_nb, const bool visible) {
+Stack *stack_create_complete_deck(int card_nb, const bool visible, const bool ace_max) {
 
 	int min = 0, max = 0;
 	if (card_nb == 52) {
-		min = 2;
-		max = 14;
+		min = (ace_max) ? 1 : 0;
+		max = (ace_max) ? 13 : 12;
 	} else if (card_nb == 32) {
-		min = 7;
-		max = 14;
+		min = 5;
+		max = 13;
 	} else {
 		return NULL;
 	}
@@ -221,7 +221,7 @@ void stack_set_visibility(Stack *s, const bool visibility) {
 		runner = runner->next;
 	}
 }
-void stack_flip(Stack *s) {
+void stack_flip(Stack *s, bool change_visibility) {
 	if (!s) return;
 	if (stack_is_empty(s) || stack_get_size(s) == 1) return;
 	Node *runner = s->tail;
@@ -230,7 +230,7 @@ void stack_flip(Stack *s) {
 		Node *temp = runner->prev;
 		runner->prev = runner->next;
 		runner->next = temp;
-		card_flip(runner->card);
+		if (change_visibility) card_flip(runner->card);
 		runner = runner->next;
 	}
 	temp = s->tail;
@@ -239,15 +239,25 @@ void stack_flip(Stack *s) {
 }
 void stack_destroy(Stack *s) {
 	if (!s) return;
-	Node *runner = s->head;
-	while (runner != NULL) {
-		s->head = runner->next;
-		node_destroy(runner);
-		s->size--;
-		runner = s->head;
+	if (s->head == NULL) {
+		free(s);
+		return;
 	}
-	s->tail = NULL;
-	free(s);
+	if (s->head->next == NULL) {
+		node_destroy(s->head);
+		s->head = NULL;
+		s->tail = NULL;
+		free(s);
+		return;
+	} else {
+		Node *to_delete = s->head->next;
+		s->head->next = to_delete->next;
+		if (to_delete->next != NULL) {
+			to_delete->next->prev = s->head;
+		}
+		node_destroy(to_delete);
+		stack_destroy(s);
+	}
 }
 
 StackIterator *stack_begin(const Stack *s) {
@@ -260,11 +270,11 @@ StackIterator *stack_end(const Stack *s) {
 }
 StackIterator *stack_rbegin(const Stack *s) {
 	if (!s) return NULL;
-	return s->head->prev;
+	return s->head;
 }
 StackIterator *stack_rend(const Stack *s) {
 	if (!s) return NULL;
-	return s->tail;
+	return s->tail->prev;
 }
 StackIterator *stack_next(const StackIterator *it) {
 	if (!it) return NULL;
@@ -275,6 +285,24 @@ StackIterator *stack_prev(const StackIterator *it) {
 	return it->prev;
 }
 
+void stack_print_raw(const Stack *s, FILE *file) {
+	StackIterator *it = stack_begin(s);
+	while (it != NULL) {
+		fprintf(file, "%u, ", *(unsigned char *)it->card);
+		it = stack_next(it);
+	}
+	fprintf(file, "\n");
+}
+
+Stack *stack_new_from_raw(unsigned char *table, size_t size) {
+	Stack *s = stack_new_empty();
+	for (size_t i = 0; i < size; i++) {
+		Card *c = malloc(sizeof(Card));
+		*c = table[i];
+		stack_add_card_under(s, c);
+	}
+	return s;
+}
 Stack *stack_split(Stack *s, int index) {
 
 	if (!s) return NULL;
@@ -282,16 +310,24 @@ Stack *stack_split(Stack *s, int index) {
 
 	Node *runner = s->head;
 	int i = 0;
-	while (runner != NULL && i < index) {
+	while (runner != s->tail && i < index) {
 		runner = runner->next;
 		i++;
 	}
-	Stack *ret = stack_new_empty();
-	ret->head = runner;
-	ret->tail = s->tail;
-	ret->size = s->size - index;
 
-	s->tail = runner->prev;
-	s->size = index;
+	Stack *ret = stack_new_empty();
+	ret->head = s->head;
+	ret->tail = runner;
+	ret->size = index + 1;
+
+	if (runner->next != NULL) {
+		s->head = runner->next;
+		s->head->prev = NULL;
+		ret->tail->next = NULL;
+	} else {
+		s->head = NULL;
+		s->tail = NULL;
+	}
+	s->size = s->size - (index + 1);
 	return ret;
 }

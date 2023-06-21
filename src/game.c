@@ -1,5 +1,6 @@
 #include "game.h"
 #include "c4/c4.h"
+#include "klondike/klondike.h"
 #include "qll/qll.h"
 #include "r7/r7.h"
 #include "up-down/up-down.h"
@@ -36,6 +37,9 @@ void card_game_new(CardGame *game) {
 		case CardGameTypeUpDown:
 			game->game = (UpDownGame *)up_down_game_new();
 			break;
+		case CardGameTypeKlondike:
+			game->game = (KlondikeGame *)klondike_game_new();
+			break;
 		default:
 			fprintf(stderr, "Unknown type of game");
 			break;
@@ -58,6 +62,9 @@ void card_game_destroy(CardGame *game) {
 			break;
 		case CardGameTypeUpDown:
 			up_down_game_destroy(game->game);
+			break;
+		case CardGameTypeKlondike:
+			klondike_game_destroy(game->game);
 			break;
 		default:
 			break;

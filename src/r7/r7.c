@@ -147,7 +147,7 @@ GameActionResult r7_game_iterate(void *game) {
 		return res;
 	}
 	res.stateChanged = 1;
-	stack_flip(rg->bin);
+	stack_flip(rg->bin, true);
 	stack_append_stack_on_bottom(rg->deck, rg->bin);
 	return res;
 }

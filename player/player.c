@@ -1,8 +1,10 @@
 #include "player.h"
 #include "parser.h"
 #include <c4/c4.h>
+#include <klondike/klondike.h>
 #include <qll/qll.h>
 #include <r7/r7.h>
+
 #include <up-down/up-down.h>
 
 ChenierPlayer *chenier_player_new() {
@@ -90,6 +92,8 @@ int main(int argc, char **argv) {
 	chenier_player_register_game(player, &qll_lose, qll_game_render);
 	chenier_player_register_game(player, &c4_normal, c4_game_render);
 	chenier_player_register_game(player, &up_down_winning, up_down_game_render);
+	chenier_player_register_game(player, &klondike_random, klondike_game_render);
+	chenier_player_register_game(player, &klondike_winning, klondike_game_render);
 
 	ChenierParser parser = {.argc = argc, .argv = argv, .parse = chenier_player_parse_arg, .user_data = player};
 	ChenierParseStatus res = chenier_parser_parse(&parser);
@@ -105,7 +109,7 @@ int main(int argc, char **argv) {
 	bool won = false;
 	if (player->enable_graphic) {
 		SDL_Window *win = chenier_player_init_graphics();
-		GraphicContext *ctx = graphic_context_new(win, chosen->game->name, 1200, 900);
+		GraphicContext *ctx = graphic_context_new(win, chosen->game->name, 800, 600);
 		won = graphic_context_play_card_game(ctx, chosen->game, chosen->render);
 		graphic_context_destroy(ctx);
 		chenier_player_destroy_graphics(win);

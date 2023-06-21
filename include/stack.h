@@ -18,7 +18,7 @@ typedef struct Stack_t {
 typedef Node StackIterator;
 
 Stack *stack_new_empty();
-Stack *stack_create_complete_deck(int card_nb, const bool visible);
+Stack *stack_create_complete_deck(int card_nb, const bool visible, const bool ace_max);
 void stack_add_card_under(Stack *s, Card *c);
 void stack_add_card_on(Stack *s, Card *c);
 uint8_t stack_get_size(const Stack *s);
@@ -35,8 +35,10 @@ void stack_append_stack_on_bottom(Stack *s, Stack *toAdd);
 void stack_append_stack_on_top(Stack *s, Stack *toAdd);
 
 void stack_set_visibility(Stack *s, const bool visibility);
-void stack_flip(Stack *s);
+void stack_flip(Stack *s, bool change_visibility);
 void stack_print(const Stack *s);
+void stack_print_raw(const Stack *s, FILE *file);
+Stack *stack_new_from_raw(unsigned char *table, size_t size);
 
 StackIterator *stack_begin(const Stack *s);
 StackIterator *stack_rbegin(const Stack *s);

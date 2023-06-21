@@ -3,7 +3,7 @@
 C4Game *c4_game_new() {
 
 	C4Game *cg = malloc(sizeof(C4Game));
-	cg->deck = stack_create_complete_deck(32, false);
+	cg->deck = stack_create_complete_deck(32, false, true);
 	for (int i = 0; i < 4; i++) {
 		cg->build[i] = stack_new_empty();
 	}

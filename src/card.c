@@ -31,6 +31,7 @@ void card_print(const Card *c) {
 		printf("# ");
 	}
 }
+
 void card_destroy(Card *c) {
 	if (!c) return;
 	free(c);

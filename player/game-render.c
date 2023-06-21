@@ -1,10 +1,12 @@
 #include "c4/c4.h"
 #include "game.h"
 #include "graphic-context.h"
+#include "klondike/klondike.h"
 #include "player.h"
 #include "qll/qll.h"
 #include "r7/r7.h"
 #include "up-down/up-down.h"
+
 void qll_game_render(GraphicContext *ctx, void *game) {
 	QllGame *qg = (QllGame *)game;
 	graphic_context_plot_stack(ctx, qg->deck, 0, 0, false);
@@ -50,5 +52,19 @@ void up_down_game_render(GraphicContext *ctx, void *game) {
 		graphic_context_plot_stack(ctx, udg->build[i], x, y, true);
 		x += ctx->card_width;
 		y -= 1.2 * ctx->card_height;
+	}
+}
+
+void klondike_game_render(GraphicContext *ctx, void *game) {
+	KlondikeGame *kg = (KlondikeGame *)game;
+
+	graphic_context_plot_stack(ctx, kg->pile, 0, 0, false);
+	graphic_context_plot_stack(ctx, kg->talon, ctx->card_width, 0, false);
+
+	for (int i = 0; i < 4; i++) {
+		graphic_context_plot_stack(ctx, kg->suite[i], (i + 3) * ctx->card_width, 0, false);
+	}
+	for (int i = 0; i < 7; i++) {
+		graphic_context_plot_stack(ctx, kg->build[i], i * ctx->card_width, ctx->card_height, true);
 	}
 }

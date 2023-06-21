@@ -13,7 +13,7 @@ UpDownGame *up_down_game_new() {
 
 bool up_down_game_init(void *game) {
 	UpDownGame *udg = (UpDownGame *)game;
-	udg->deck = stack_create_complete_deck(32, false);
+	udg->deck = stack_create_complete_deck(32, false, false);
 	stack_shuffle(udg->deck);
 	return true;
 }

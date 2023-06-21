@@ -54,13 +54,17 @@ SDL_Rect graphic_context_get_card_rect(GraphicContext *gc, const Card *card) {
 	SDL_Rect ret = {0};
 	ret.w = gc->card_width;
 	ret.h = gc->card_height;
-	if (card_is_visible(card)) {
-		ret.x = (card_value(card) - 2) * gc->card_width;
-		ret.y = (card_family(card)) * gc->card_height;
-	} else {
+	if (!card_is_visible(card)) {
 		ret.x = 2 * gc->card_width;
 		ret.y = 4 * gc->card_height;
+		return ret;
 	}
+	if (card_value(card) == 0 || card_value(card) == 13) {
+		ret.x = 12 * gc->card_width;
+	} else {
+		ret.x = (card_value(card) - 1) * gc->card_width;
+	}
+	ret.y = (card_family(card)) * gc->card_height;
 	return ret;
 }
 void graphic_context_plot_card(GraphicContext *gc, const Card *card, int x, int y) {
@@ -79,7 +83,7 @@ void graphic_context_plot_stack(GraphicContext *gc, Stack *stack, int x, int y, 
 		// TODO : implement a stack iterator
 		int xi = x;
 		int yi = y;
-		Node *runner = stack->tail;
+		StackIterator *runner = stack->tail;
 		while (runner != NULL) {
 			SDL_Rect src = graphic_context_get_card_rect(gc, runner->card);
 			SDL_Rect dst = {.x = xi, .y = yi, .w = gc->card_width, .h = gc->card_height};

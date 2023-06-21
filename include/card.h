@@ -12,9 +12,19 @@
 
 typedef enum Family_t {
 
-	CUBE = 0,
+	/**
+	 * ♣️
+	 */
+	CLUB = 0,
+	/**
+	 *♦️
+	 */
 	DIAMOND = 1,
+	/**
+	 * ♠️
+	 */
 	SPADE = 2,
+	/** ♥️*/
 	HEART = 3,
 
 } Family;

@@ -172,6 +172,7 @@ static void stack_iterator_test(void) {
 		it = stack_prev(it);
 		i++;
 	}
+	stack_destroy(s);
 }
 
 static void stack_split_test(void) {
@@ -185,8 +186,10 @@ static void stack_split_test(void) {
 
 	Stack *s2 = stack_split(s1, 2);
 
-	CU_ASSERT_EQUAL(stack_get_size(s1), 2);
-	int i = 13;
+	CU_ASSERT_EQUAL(stack_get_size(s1), 3);
+	CU_ASSERT_EQUAL(stack_get_size(s2), 3);
+
+	int i = 10;
 	for (StackIterator *it = stack_begin(s1); it != stack_end(s1); it = stack_next(it)) {
 		CU_ASSERT_EQUAL(card_value(it->card), i);
 		i--;
@@ -194,8 +197,10 @@ static void stack_split_test(void) {
 	i = 11;
 	for (StackIterator *it = stack_begin(s2); it != stack_end(s2); it = stack_next(it)) {
 		CU_ASSERT_EQUAL(card_value(it->card), i);
-		i--;
+		i++;
 	}
+	stack_destroy(s1);
+	stack_destroy(s2);
 }
 
 static CU_TestInfo tests[] = {
@@ -208,7 +213,7 @@ static CU_TestInfo tests[] = {
     {"pop top/bottom", pop_from_top_to_bottom_test},
     {"pop top/bottom empty", pop_from_top_to_bottom_on_empty_test},
     {"stack const iterator", stack_iterator_test},
-    {"stack append iterator from", stack_split_test},
+    {"stack split", stack_split_test},
 
     CU_TEST_INFO_NULL,
 };

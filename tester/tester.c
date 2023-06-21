@@ -38,6 +38,9 @@ ChenierTester *chenier_tester_new(CU_SuiteInfo *suites_list) {
 	return tester;
 }
 
+void chenier_tester_destroy(ChenierTester *tester) {
+	if (tester) free(tester);
+}
 void chenier_tester_print(ChenierTester *tester) {
 	printf("suite : %s\ntest : %s\n", tester->suite_name, tester->test_name);
 }
@@ -92,6 +95,7 @@ int main(int argc, char *argv[]) {
 	CU_SuiteInfo suites[] = {
 	    card_stack_suite,
 	    r7_suite,
+	    klondike_suite,
 	    CU_SUITE_INFO_NULL,
 	};
 	CU_register_suites(suites);
@@ -100,5 +104,6 @@ int main(int argc, char *argv[]) {
 	ChenierParseStatus s = chenier_parser_parse(&parser);
 	if (s == ChenierParseStatus_PARSING_OK) chenier_tester_run(tester);
 	CU_cleanup_registry();
+	chenier_tester_destroy(tester);
 	return 0;
 }

@@ -8,7 +8,7 @@ fi
 
 url="https://deckofcardsapi.com/static/img"
 
-families=("C" "D" "H" "S")
+families=("C" "D" "S" "H")
 values=("2" "3" "4" "5" "6" "7" "8" "9" "0" "J" "Q" "K" "A")
 
 row=()
