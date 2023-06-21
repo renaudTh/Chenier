@@ -17,8 +17,10 @@ typedef enum KlondikeGameMoveType {
 	BuildToBuild,
 	BuildToSuit,
 	TalonToBuild,
+	TalonToSuite,
 	PileToTalon,
 	SuiteToBuild,
+	Redeal,
 } KlondikeGameMoveType;
 
 typedef struct _KlondikeGameLegalMove {
@@ -29,6 +31,8 @@ typedef struct _KlondikeGameLegalMove {
 	struct _KlondikeGameLegalMove *next;
 
 } KlondikeGameLegalMove;
+
+KlondikeGameLegalMove *klondike_game_legal_move_new(KlondikeGameMoveType type, const Stack *from, const Stack *to);
 
 KlondikeGame *klondike_game_new();
 bool klondike_game_winning_init(void *game);
