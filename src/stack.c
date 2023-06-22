@@ -258,6 +258,14 @@ StackIterator *stack_end(const Stack *s) {
 	if (!s) return NULL;
 	return s->tail->next;
 }
+StackIterator *stack_rbegin(const Stack *s) {
+	if (!s) return NULL;
+	return s->head->prev;
+}
+StackIterator *stack_rend(const Stack *s) {
+	if (!s) return NULL;
+	return s->tail;
+}
 StackIterator *stack_next(const StackIterator *it) {
 	if (!it) return NULL;
 	return it->next;
@@ -265,4 +273,25 @@ StackIterator *stack_next(const StackIterator *it) {
 StackIterator *stack_prev(const StackIterator *it) {
 	if (!it) return NULL;
 	return it->prev;
+}
+
+Stack *stack_split(Stack *s, int index) {
+
+	if (!s) return NULL;
+	if (index < 0 || index >= s->size) return NULL;
+
+	Node *runner = s->head;
+	int i = 0;
+	while (runner != NULL && i < index) {
+		runner = runner->next;
+		i++;
+	}
+	Stack *ret = stack_new_empty();
+	ret->head = runner;
+	ret->tail = s->tail;
+	ret->size = s->size - index;
+
+	s->tail = runner->prev;
+	s->size = index;
+	return ret;
 }

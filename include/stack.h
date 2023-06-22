@@ -39,8 +39,10 @@ void stack_flip(Stack *s);
 void stack_print(const Stack *s);
 
 StackIterator *stack_begin(const Stack *s);
+StackIterator *stack_rbegin(const Stack *s);
 StackIterator *stack_end(const Stack *s);
+StackIterator *stack_rend(const Stack *s);
 StackIterator *stack_next(const StackIterator *it);
 StackIterator *stack_prev(const StackIterator *it);
-
+Stack *stack_split(Stack *s, int index);
 #endif // STACK_H
