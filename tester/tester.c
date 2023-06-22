@@ -92,6 +92,7 @@ int main(int argc, char *argv[]) {
 	CU_SuiteInfo suites[] = {
 	    card_stack_suite,
 	    r7_suite,
+	    klondike_suite,
 	    CU_SUITE_INFO_NULL,
 	};
 	CU_register_suites(suites);

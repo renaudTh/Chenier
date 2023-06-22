@@ -28,35 +28,48 @@ void klondike_game_destroy(void *game) {
 	free(kg);
 }
 
-bool klondike_game_is_to_build_legal_move(Stack *from, Stack *to) {
-	const Card *from_card = stack_read_first(from);
+bool klondike_game_is_to_build_legal_move(const Card *from, Stack *to) {
+
 	if (stack_is_empty(to)) {
-		return (card_value(from_card) == 13);
+		return (card_value(from) == 13);
 	}
 	const Card *to_card = stack_read_first(to);
-	return (card_value(to_card) == card_value(from_card) - 1) &&
-	       (((card_family(from_card) % 2) & (card_family(to_card) % 2)) == 0);
+
+	return (card_value(to_card) == card_value(from) + 1) &&
+	       (((card_family(from) % 2) & (card_family(to_card) % 2)) == 0);
 }
 
-bool klondike_game_is_to_suite_legal_move(KlondikeGame *kg, Stack *from) {
-	const Card *from_card = stack_read_first(from);
-	Family f = card_family(from_card);
+bool klondike_game_is_to_suite_legal_move(KlondikeGame *kg, const Card *from) {
 
+	Family f = card_family(from);
 	if (stack_is_empty(kg->suite[f])) {
-		return (card_value(from_card) == 1);
+		return (card_value(from) == 1);
 	}
 	const Card *to_card = stack_read_first(kg->suite[f]);
-	return (card_value(to_card) == card_value(from_card) - 1);
+	return ((card_value(to_card)) == (card_value(from) - 1));
 }
-KlondikeGameLegalMove *klondike_game_legal_move_new(KlondikeGameMoveType type, const Stack *from, const Stack *to) {
+KlondikeGameLegalMove *klondike_game_legal_move_new(KlondikeGameMoveType type, Stack *from, Stack *to) {
 	KlondikeGameLegalMove *m = malloc(sizeof(KlondikeGameLegalMove));
 	m->from = from;
 	m->to = to;
 	m->type = type;
 	m->next = NULL;
+	m->index_from = 0;
 	return m;
 }
+void klondike_game_legal_move_append(KlondikeGameLegalMove **head, KlondikeGameLegalMove *to_append) {
 
+	if (to_append == NULL) return;
+	if (*head == NULL) {
+		*head = to_append;
+		return;
+	}
+	KlondikeGameLegalMove *runner = *head;
+	while (runner->next != NULL) {
+		runner = runner->next;
+	}
+	runner->next = to_append;
+}
 KlondikeGameLegalMove *klondike_game_pile_move(KlondikeGame *kg) {
 
 	KlondikeGameLegalMove *m = NULL;
@@ -69,50 +82,72 @@ KlondikeGameLegalMove *klondike_game_pile_move(KlondikeGame *kg) {
 }
 
 KlondikeGameLegalMove *klondike_game_talon_move(KlondikeGame *kg) {
+
+	if (kg->talon == NULL) return NULL;
+	const Card *c = stack_read_first(kg->talon);
 	// Talon to build
-	KlondikeGameLegalMove *head = NULL;
-	KlondikeGameLegalMove *move = NULL;
+	KlondikeGameLegalMove *head = NULL, *move = NULL;
 	for (int i = 0; i < 7; i++) {
-		if (!klondike_game_is_to_build_legal_move(kg->pile, kg->build[i])) continue;
-		move = klondike_game_legal_move_new(TalonToBuild, kg->pile, kg->build[i]);
-		if (head == NULL) {
-			head = move;
-		}
-		move = move->next;
+		if (!klondike_game_is_to_build_legal_move(c, kg->build[i])) continue;
+		move = klondike_game_legal_move_new(TalonToBuild, kg->talon, kg->build[i]);
+		klondike_game_legal_move_append(&head, move);
 	}
 	// Talon to suite
-	for (int i = 0; i < 4; i++) {
-		if (!klondike_game_is_to_suite_legal_move(kg, kg->talon)) continue;
-		move = klondike_game_legal_move_new(TalonToSuite, kg->pile, kg->suite[i]);
-		if (head == NULL) {
-			head = move;
-		}
-		move = move->next;
+	if (klondike_game_is_to_suite_legal_move(kg, c)) {
+		move = klondike_game_legal_move_new(TalonToSuite, kg->talon, kg->suite[card_family(c)]);
+		klondike_game_legal_move_append(&head, move);
 	}
 	return head;
 }
 
-klondike_game_find_legal_moves(void *game) {
-	KlondikeGame *kg = (KlondikeGame *)game;
-	// Warning : if pile is empty !!
-	KlondikeGameLegalMove *head = malloc(sizeof(KlondikeGameLegalMove));
-	head->from = kg->pile;
-	head->to = kg->talon;
-	head->type = PileToTalon;
-	head->next = NULL;
-	KlondikeGameLegalMove *current = head->next;
+KlondikeGameLegalMove *klondike_game_build_to_build(KlondikeGame *kg, Stack *from) {
 
-	// From Build to Build
-	for (int from = 0; from < 7; from++) {
-		if (stack_is_empty(kg->build[from])) continue;
-		for (int to = 0; to < 7; to++) {
-			if (to == from) continue;
-			if (klondike_game_is_to_build_legal_move(kg->build[from], kg->build[to])) {
-				current = klondike_legal_move_new(BuildToBuild, kg->build[from], kg->build[to]);
-				current = current->next;
-			}
+	if (!from || stack_is_empty(from)) return NULL;
+	StackIterator *it = stack_begin(from);
+	KlondikeGameLegalMove *head = NULL, *move = NULL;
+	int index = 0;
+	while (card_is_visible(it->card) && it != stack_end(from)) {
+		for (int i = 0; i < 7; i++) {
+			if (from == kg->build[i]) continue;
+			if (!klondike_game_is_to_build_legal_move(it->card, kg->build[i])) continue;
+			move = klondike_game_legal_move_new(BuildToBuild, from, kg->build[i]);
+			move->index_from = index;
+			klondike_game_legal_move_append(&head, move);
+		}
+		it = stack_next(it);
+		index++;
+	}
+	return head;
+}
+
+KlondikeGameLegalMove *klondike_game_build_moves(KlondikeGame *kg) {
+
+	KlondikeGameLegalMove *moves = NULL, *current = NULL;
+	for (int i = 0; i < 7; i++) {
+		current = klondike_game_build_to_build(kg, kg->build[i]);
+		klondike_game_legal_move_append(&moves, current);
+	}
+	return moves;
+}
+
+KlondikeGameLegalMove *klondike_game_suite_moves(KlondikeGame *kg) {
+	KlondikeGameLegalMove *moves = NULL, *current = NULL;
+	for (int i = 0; i < 7; i++) {
+		if (stack_is_empty(kg->build[i])) continue;
+		const Card *card = stack_read_first(kg->build[i]);
+		if (klondike_game_is_to_suite_legal_move(kg, card)) {
+			current = klondike_game_legal_move_new(BuildToSuit, kg->build[i], kg->suite[card_family(card)]);
+			klondike_game_legal_move_append(&moves, current);
 		}
 	}
+	return moves;
+}
+KlondikeGameLegalMove *klondike_game_find_legal_moves(KlondikeGame *kg) {
 
-	return head;
+	KlondikeGameLegalMove *moves = NULL;
+	klondike_game_legal_move_append(&moves, klondike_game_pile_move(kg));
+	klondike_game_legal_move_append(&moves, klondike_game_talon_move(kg));
+	klondike_game_legal_move_append(&moves, klondike_game_build_moves(kg));
+	klondike_game_legal_move_append(&moves, klondike_game_suite_moves(kg));
+	return moves;
 }

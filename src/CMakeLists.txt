@@ -7,6 +7,7 @@ qll/qll.c
 c4/c4.c
 parser/parser.c
 up-down/up-down.c
+klondike/klondike.c
 )
 
 add_library(cardGames ${C_SOURCE_FILE})

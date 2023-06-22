@@ -1,6 +1,7 @@
 set(C_SOURCE_FILE 
 card-stack-tester.c
 r7-tester.c
+klondike-tester.c
 tester.c
 )
 
