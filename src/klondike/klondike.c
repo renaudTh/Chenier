@@ -130,6 +130,13 @@ KlondikeGameLegalMove *klondike_game_build_moves(KlondikeGame *kg) {
 	return moves;
 }
 
+void Klondike_game_move(KlondikeGameLegalMove *move) {
+
+	Stack *temp = stack_split(move->from, move->index_from);
+	stack_append_stack_on_top(move->to, temp);
+	stack_destroy(temp);
+}
+
 KlondikeGameLegalMove *klondike_game_suite_moves(KlondikeGame *kg) {
 	KlondikeGameLegalMove *moves = NULL, *current = NULL;
 	for (int i = 0; i < 7; i++) {

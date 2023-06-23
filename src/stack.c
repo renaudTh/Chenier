@@ -221,7 +221,7 @@ void stack_set_visibility(Stack *s, const bool visibility) {
 		runner = runner->next;
 	}
 }
-void stack_flip(Stack *s) {
+void stack_flip(Stack *s, bool change_visibility) {
 	if (!s) return;
 	if (stack_is_empty(s) || stack_get_size(s) == 1) return;
 	Node *runner = s->tail;
@@ -230,7 +230,7 @@ void stack_flip(Stack *s) {
 		Node *temp = runner->prev;
 		runner->prev = runner->next;
 		runner->next = temp;
-		card_flip(runner->card);
+		if (change_visibility) card_flip(runner->card);
 		runner = runner->next;
 	}
 	temp = s->tail;
@@ -287,11 +287,12 @@ Stack *stack_split(Stack *s, int index) {
 		i++;
 	}
 	Stack *ret = stack_new_empty();
-	ret->head = runner;
-	ret->tail = s->tail;
-	ret->size = s->size - index;
+	ret->head = s->head;
+	ret->tail = runner;
+	ret->size = s->size - index - 1;
+	s->head = runner->next;
+	s->size = index + 1;
 
-	s->tail = runner->prev;
-	s->size = index;
+	stack_flip(ret, false);
 	return ret;
 }
