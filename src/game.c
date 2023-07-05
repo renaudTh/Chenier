@@ -50,7 +50,18 @@ bool card_game_init(CardGame *game) {
 bool card_game_reinit(CardGame *game) {
 	return game->reinit(game->game);
 }
-
+CardGame *card_game_copy(CardGame *game) {
+	CardGame *ret = malloc(sizeof(CardGame));
+	ret->ended = game->ended;
+	ret->init = game->init;
+	ret->iterate = game->iterate;
+	ret->name = game->name;
+	ret->play_card = game->play_card;
+	ret->reinit = game->reinit;
+	ret->type = game->type;
+	ret->won = game->won;
+	return ret;
+}
 void card_game_destroy(CardGame *game) {
 
 	if (!game) return;

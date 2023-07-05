@@ -2,6 +2,8 @@
 #define PLAYER_H
 #define MAX_GAME_PLAYER 100
 #include "graphic-context.h"
+#include <pthread.h>
+
 typedef struct ChenierGame {
 	CardGame *game;
 	render_fct render;
@@ -10,10 +12,13 @@ typedef struct ChenierGame {
 typedef struct ChenierPlayer {
 
 	ChenierGame *game_registry[MAX_GAME_PLAYER];
+	ChenierGame *chosen_game;
 	int registry_size;
 	char *game_name;
 	int nb_games;
 	bool enable_graphic;
+	int nb_threads;
+
 } ChenierPlayer;
 
 void r7_game_render(GraphicContext *gc, void *game);

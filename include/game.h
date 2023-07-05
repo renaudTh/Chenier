@@ -42,5 +42,5 @@ void card_game_new(CardGame *game);
 bool card_game_init(CardGame *game);
 bool card_game_reinit(CardGame *game);
 void card_game_destroy(CardGame *game);
-
+CardGame *card_game_copy(CardGame *game);
 #endif // GAME_H
