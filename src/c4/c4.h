@@ -14,6 +14,7 @@ typedef struct C4Game {
 
 C4Game *c4_game_new();
 bool c4_game_init(void *game);
+bool c4_game_reinit(void *game);
 GameActionResult c4_game_play_card(void *game);
 bool c4_game_winning_condition(void *game);
 bool c4_game_ending_condition(void *game);

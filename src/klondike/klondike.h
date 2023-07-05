@@ -62,7 +62,7 @@ GameActionResult klondike_game_iterate(void *game);
 bool klondike_game_ended(void *game);
 bool klondike_game_won(void *game);
 void klondike_game_destroy(void *game);
-
+bool klondike_game_reinit(void *game);
 extern CardGame klondike_random;
 extern CardGame klondike_winning;
 

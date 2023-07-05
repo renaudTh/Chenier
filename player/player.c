@@ -12,7 +12,7 @@ ChenierPlayer *chenier_player_new() {
 	ChenierPlayer *player = malloc(sizeof(ChenierPlayer));
 	player->enable_graphic = false;
 	player->game_name = NULL;
-	player->replay = 0;
+	player->nb_games = 1;
 	player->registry_size = 0;
 
 	return player;
@@ -26,10 +26,10 @@ ChenierParseStatus chenier_player_parse_arg(int argc, char **argv, int *i, void 
 		player->game_name = argv[*i];
 	} else if (strcmp(argv[*i], "--enable-graphic") == 0) {
 		player->enable_graphic = true;
-	} else if (strcmp(argv[*i], "--replay") == 0) {
+	} else if (strcmp(argv[*i], "--nb-games") == 0) {
 		CHECK_ARGS(*i, argc);
 		*i += 1;
-		player->replay = atoi(argv[*i]);
+		player->nb_games = atoi(argv[*i]);
 	} else {
 		return ChenierParseStatus_UNKNOWN_COMMAND;
 	}
@@ -82,6 +82,40 @@ void chenier_player_destroy(ChenierPlayer *p) {
 	}
 	free(p);
 }
+
+bool chenier_player_play_game(ChenierPlayer *player, ChenierGame *game_chosen) {
+
+	card_game_new(game_chosen->game);
+	card_game_init(game_chosen->game);
+	bool won = false;
+	int played_count = 0;
+	SDL_Window *win = NULL;
+	GraphicContext *ctx = NULL;
+	int won_games = 0;
+	if (player->enable_graphic) {
+		win = chenier_player_init_graphics();
+		ctx = graphic_context_new(win, game_chosen->game->name, 800, 600);
+	}
+	while (played_count < player->nb_games) {
+		if (player->enable_graphic) {
+			won = graphic_context_play_card_game(ctx, game_chosen->game, game_chosen->render);
+		} else {
+			won = card_game_play(game_chosen->game);
+		}
+		won_games += (won);
+		// if (won) printf("YOU WON!\n");
+		// else printf("YOU LOSE!\n");
+		played_count++;
+		if (played_count < player->nb_games) card_game_reinit(game_chosen->game);
+	}
+	if (player->enable_graphic) {
+		graphic_context_destroy(ctx);
+		chenier_player_destroy_graphics(win);
+	}
+	float winrate = (float)won_games / (float)player->nb_games;
+	printf("winrate : %f\n", winrate);
+	return won;
+}
 int main(int argc, char **argv) {
 	srand(time(NULL));
 	ChenierPlayer *player = chenier_player_new();
@@ -105,19 +139,7 @@ int main(int argc, char **argv) {
 		chenier_player_list_registered_games(player);
 		exit(0);
 	}
-	card_game_new(chosen->game);
-	bool won = false;
-	if (player->enable_graphic) {
-		SDL_Window *win = chenier_player_init_graphics();
-		GraphicContext *ctx = graphic_context_new(win, chosen->game->name, 800, 600);
-		won = graphic_context_play_card_game(ctx, chosen->game, chosen->render);
-		graphic_context_destroy(ctx);
-		chenier_player_destroy_graphics(win);
-	} else {
-		won = card_game_play(chosen->game);
-	}
-	if (won) printf("YOU WON!\n");
-	else printf("YOU LOSE!\n");
+	chenier_player_play_game(player, chosen);
 	card_game_destroy(chosen->game);
 	chenier_player_destroy(player);
 	return 0;

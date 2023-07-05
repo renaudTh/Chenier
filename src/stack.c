@@ -240,6 +240,7 @@ void stack_flip(Stack *s, bool change_visibility) {
 void stack_destroy(Stack *s) {
 	if (!s) return;
 	if (s->head == NULL) {
+		s->size = 0;
 		free(s);
 		return;
 	}
@@ -247,6 +248,7 @@ void stack_destroy(Stack *s) {
 		node_destroy(s->head);
 		s->head = NULL;
 		s->tail = NULL;
+		s->size = 0;
 		free(s);
 		return;
 	} else {
@@ -330,4 +332,29 @@ Stack *stack_split(Stack *s, int index) {
 	}
 	s->size = s->size - (index + 1);
 	return ret;
+}
+
+void stack_empty(Stack *s) {
+
+	if (!s) return;
+	if (s->head == NULL) {
+		s->size = 0;
+		s->tail = NULL;
+		return;
+	}
+	if (s->head->next == NULL) {
+		node_destroy(s->head);
+		s->head = NULL;
+		s->tail = NULL;
+		s->size = 0;
+		return;
+	} else {
+		Node *to_delete = s->head->next;
+		s->head->next = to_delete->next;
+		if (to_delete->next != NULL) {
+			to_delete->next->prev = s->head;
+		}
+		node_destroy(to_delete);
+		stack_empty(s);
+	}
 }

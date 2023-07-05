@@ -96,6 +96,15 @@ bool qll_game_won(void *game) {
 	return ((stack_is_empty(qg->deck)) && (qg->line_size == 2));
 }
 
+bool qll_game_reinit(void *game) {
+	QllGame *qg = (QllGame *)game;
+	stack_empty(qg->deck);
+	while (qg->line_size > 0) {
+		stack_empty(qg->table[--qg->line_size]);
+	}
+	return qll_game_winning_init(game);
+}
+
 void qll_game_destroy(void *game) {
 	QllGame *qg = (QllGame *)game;
 	if (qg->deck) {
@@ -118,6 +127,7 @@ CardGame qll_win = {
     .play_card = qll_game_play_card,
     .won = qll_game_won,
     .type = CardGameTypeQLL,
+    .reinit = qll_game_reinit,
 };
 CardGame qll_lose = {
     .ended = qll_game_ended,
@@ -127,4 +137,5 @@ CardGame qll_lose = {
     .play_card = qll_game_play_card,
     .won = qll_game_won,
     .type = CardGameTypeQLL,
+    .reinit = qll_game_reinit,
 };

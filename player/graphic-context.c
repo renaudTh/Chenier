@@ -115,7 +115,7 @@ void graphic_context_wait_for_click() {
 	}
 }
 bool graphic_context_play_card_game(GraphicContext *ctx, CardGame *cg, render_fct game_render) {
-	cg->init(cg->game);
+
 	graphic_context_render(ctx, game_render, cg->game);
 	GameActionResult res = {0};
 	while (!cg->ended(cg->game)) {

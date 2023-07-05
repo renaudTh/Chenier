@@ -123,7 +123,15 @@ void up_down_game_destroy(UpDownGame *udg) {
 	if (udg->deck) stack_destroy(udg->deck);
 	free(udg);
 }
-
+bool up_down_game_reinit(void *game) {
+	UpDownGame *udg = (UpDownGame *)game;
+	for (int i = 0; i < 4; i++) {
+		if (udg->build[i]) stack_empty(udg->build[i]);
+		if (udg->stock[i]) stack_empty(udg->stock[i]);
+	}
+	if (udg->deck) stack_empty(udg->deck);
+	return up_down_game_init(game);
+}
 CardGame up_down_winning = {
     .ended = up_down_game_ending_condition,
     .init = up_down_game_winning_init,
@@ -132,4 +140,5 @@ CardGame up_down_winning = {
     .play_card = up_down_game_play_card,
     .type = CardGameTypeUpDown,
     .won = up_down_game_winning_condition,
+    .reinit = up_down_game_reinit,
 };

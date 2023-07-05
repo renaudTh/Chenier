@@ -16,6 +16,8 @@ typedef struct UpDownGame_t {
 UpDownGame *up_down_game_new();
 
 bool up_down_game_init(void *game);
+bool up_down_game_reinit(void *game);
+
 GameActionResult up_down_game_play_card(void *game);
 bool up_down_game_winning_condition(void *game);
 bool up_down_game_ending_condition(void *game);

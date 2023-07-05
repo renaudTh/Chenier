@@ -7,7 +7,6 @@
 
 bool card_game_play(CardGame *cg) {
 
-	cg->init(cg->game);
 	GameActionResult res = {0};
 	while (!cg->ended(cg->game)) {
 		do {
@@ -44,6 +43,12 @@ void card_game_new(CardGame *game) {
 			fprintf(stderr, "Unknown type of game");
 			break;
 	}
+}
+bool card_game_init(CardGame *game) {
+	return game->init(game->game);
+}
+bool card_game_reinit(CardGame *game) {
+	return game->reinit(game->game);
 }
 
 void card_game_destroy(CardGame *game) {

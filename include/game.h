@@ -10,6 +10,7 @@ typedef struct GameActionResult {
 } GameActionResult;
 
 typedef bool (*game_init)(void *);
+typedef bool (*game_reinit)(void *);
 typedef GameActionResult (*game_play_card)(void *);
 typedef GameActionResult (*game_iterate)(void *);
 typedef bool (*game_ended)(void *);
@@ -33,10 +34,13 @@ typedef struct CardGame {
 	game_iterate iterate;
 	game_ended ended;
 	game_won won;
+	game_reinit reinit;
 } CardGame;
 
 bool card_game_play(CardGame *cg);
 void card_game_new(CardGame *game);
+bool card_game_init(CardGame *game);
+bool card_game_reinit(CardGame *game);
 void card_game_destroy(CardGame *game);
 
 #endif // GAME_H

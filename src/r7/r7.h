@@ -21,6 +21,7 @@ bool r7_init_losing_game(void *game);
 bool r7_init_winning_game_in_two_attempts(void *game);
 
 bool r7_game_init(void *game);
+bool r7_game_reinit(void *game);
 GameActionResult r7_game_play_card(void *game);
 bool r7_game_winning_condition(void *game);
 bool r7_game_ending_condition(void *game);

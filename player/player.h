@@ -12,7 +12,7 @@ typedef struct ChenierPlayer {
 	ChenierGame *game_registry[MAX_GAME_PLAYER];
 	int registry_size;
 	char *game_name;
-	int replay;
+	int nb_games;
 	bool enable_graphic;
 } ChenierPlayer;
 

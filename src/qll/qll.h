@@ -16,6 +16,7 @@ typedef struct QllGame {
 QllGame *qll_game_new(int nb_cards);
 bool qll_game_winning_init(void *game);
 bool qll_game_losing_init(void *game);
+bool qll_game_reinit(void *game);
 GameActionResult qll_game_play_card(void *game);
 GameActionResult qll_game_iterate(void *game);
 bool qll_game_ended(void *game);

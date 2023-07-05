@@ -78,6 +78,18 @@ void c4_game_destroy(C4Game *cg) {
 	}
 	free(cg);
 }
+bool c4_game_reinit(void *game) {
+	C4Game *cg = (C4Game *)game;
+	if (cg->deck) {
+		stack_empty(cg->deck);
+	}
+	for (int i = 0; i < 4; i++) {
+		if (cg->build[i]) {
+			stack_empty(cg->build[i]);
+		}
+	}
+	return c4_game_init(game);
+}
 CardGame c4_normal = {
     .ended = c4_game_ending_condition,
     .init = c4_game_init,
@@ -86,4 +98,5 @@ CardGame c4_normal = {
     .play_card = c4_game_play_card,
     .won = c4_game_winning_condition,
     .type = CardGameTypeC4,
+    .reinit = c4_game_reinit,
 };

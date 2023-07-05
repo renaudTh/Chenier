@@ -254,7 +254,7 @@ bool klondike_game_init_random(void *game) {
 		}
 		stack_pop_from_top_to_top(kg->pile, kg->build[i], true);
 	}
-	klondike_game_save_state(kg, "random.txt");
+
 	return true;
 }
 
@@ -496,6 +496,24 @@ bool klondike_game_init_non_trivial_winning(void *game) {
 
 	return true;
 }
+bool klondike_game_reinit(void *game) {
+	KlondikeGame *kg = (KlondikeGame *)game;
+	if (kg->pile) stack_empty(kg->pile);
+	if (kg->talon) stack_empty(kg->talon);
+	for (int i = 0; i < 4; i++) {
+		if (kg->suite[i]) stack_empty(kg->suite[i]);
+	}
+	for (int i = 0; i < 7; i++) {
+		if (kg->build[i]) stack_empty(kg->build[i]);
+	}
+	if (kg->moves_list) klondike_game_legal_move_destroy_all(&kg->moves_list);
+	kg->lose = false;
+	kg->dead_end = false;
+	kg->max_move_priority = -1;
+	kg->max_move_score = 0;
+	return klondike_game_init_random(game);
+}
+
 CardGame klondike_winning = {
     .ended = klondike_game_ended,
     .init = klondike_game_init_non_trivial_winning,
@@ -504,6 +522,7 @@ CardGame klondike_winning = {
     .play_card = klondike_game_play_card,
     .won = klondike_game_won,
     .type = CardGameTypeKlondike,
+    .reinit = klondike_game_reinit,
 };
 CardGame klondike_random = {
     .ended = klondike_game_ended,
@@ -513,4 +532,5 @@ CardGame klondike_random = {
     .play_card = klondike_game_play_card,
     .won = klondike_game_won,
     .type = CardGameTypeKlondike,
+    .reinit = klondike_game_reinit,
 };

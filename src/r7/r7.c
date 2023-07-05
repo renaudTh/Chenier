@@ -161,6 +161,17 @@ void r7_game_destroy(R7Game *rg) {
 	free(rg);
 }
 
+bool r7_game_reinit(void *game) {
+	R7Game *rg = (R7Game *)game;
+	rg->attempt_nb = 0;
+	stack_empty(rg->deck);
+	stack_empty(rg->bin);
+	for (int i = 0; i < NB_R7_BUILD_STACK; i++) {
+		stack_empty(rg->build[i]);
+	}
+	return r7_game_init(game);
+}
+
 bool r7_game_main_loop(R7Game *rg) {
 
 	GameActionResult res = {0};
@@ -181,6 +192,7 @@ CardGame r7_winning = {
     .play_card = r7_game_play_card,
     .won = r7_game_winning_condition,
     .type = CardGameTypeR7,
+    .reinit = r7_game_reinit,
 };
 CardGame r7_losing = {
     .ended = r7_game_ending_condition,
@@ -190,6 +202,7 @@ CardGame r7_losing = {
     .play_card = r7_game_play_card,
     .won = r7_game_winning_condition,
     .type = CardGameTypeR7,
+    .reinit = r7_game_reinit,
 };
 CardGame r7_normal = {
     .ended = r7_game_ending_condition,
@@ -199,4 +212,5 @@ CardGame r7_normal = {
     .play_card = r7_game_play_card,
     .won = r7_game_winning_condition,
     .type = CardGameTypeR7,
+    .reinit = r7_game_reinit,
 };
