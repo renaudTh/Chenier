@@ -5,7 +5,7 @@ on:
      types:
       - synchronize
 jobs:
-  build:
+  linux-build:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,7 +16,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libsdl2-dev libsdl2-image-dev libcunit1-dev
-      - name: Ubuntu
+      - name: Ubuntu build
         run: |
           mkdir build && cd build
           cmake ..
@@ -28,8 +28,27 @@ jobs:
           name: Build artifacts
           path: build
 
+  macos-build:
+
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        uses: BrettDong/setup-sdl2-frameworks@main
+        with:
+          sdl2: latest
+          sdl2-image: latest
+      - name: Macosx build
+        run: |
+          
+          mkdir build && cd build
+          cmake ..
+          cmake --build . -j8
+
   test:
-    needs: build
+    needs: linux-build
     runs-on: ubuntu-latest
 
     steps:
