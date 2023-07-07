@@ -12,4 +12,4 @@ klondike/klondike.c
 
 add_library(cardGames ${C_SOURCE_FILE})
 target_link_libraries(cardGames)
-include_directories(${SOURCE_DIR})
+include_directories(${CHENIER_SOURCE_DIR})
