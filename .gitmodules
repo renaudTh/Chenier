@@ -1,11 +1,11 @@
-[submodule "external/cunit"]
-	path = external/cunit
-	url = https://gitlab.com/cunity/cunit.git
 [submodule "external/SDL"]
 	path = external/SDL
 	url = https://github.com/libsdl-org/SDL.git
-	branch = release-2.28.x
+	branch = release-2.8.x
 [submodule "external/SDL_image"]
 	path = external/SDL_image
 	url = https://github.com/libsdl-org/SDL_image.git
 	branch = release-2.6.x
+[submodule "external/cunit"]
+	path = external/cunit
+	url = https://gitlab.com/cunity/cunit.git
