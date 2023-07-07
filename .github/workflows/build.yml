@@ -11,41 +11,19 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libsdl2-dev libsdl2-image-dev libcunit1-dev
+        with:
+          submodules: recursive
       - name: Ubuntu build
         run: |
           mkdir build && cd build
           cmake ..
-          cmake --build . -j8
+          cmake --build . -j16
 
       - name: Archive build artifacts
         uses: actions/upload-artifact@v2
         with:
           name: Build artifacts
           path: build
-
-  macos-build:
-
-    runs-on: macos-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Install dependencies
-        uses: BrettDong/setup-sdl2-frameworks@main
-        with:
-          sdl2: latest
-          sdl2-image: latest
-      - name: Macosx build
-        run: |
-          
-          mkdir build && cd build
-          cmake ..
-          cmake --build . -j8
 
   test:
     needs: linux-build
