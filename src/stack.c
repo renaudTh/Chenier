@@ -272,11 +272,11 @@ StackIterator *stack_end(const Stack *s) {
 }
 StackIterator *stack_rbegin(const Stack *s) {
 	if (!s) return NULL;
-	return s->head;
+	return s->tail;
 }
 StackIterator *stack_rend(const Stack *s) {
 	if (!s) return NULL;
-	return s->tail->prev;
+	return s->head->prev;
 }
 StackIterator *stack_next(const StackIterator *it) {
 	if (!it) return NULL;

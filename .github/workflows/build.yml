@@ -20,11 +20,10 @@ jobs:
           cmake --build . -j16
       - name: Run tests
         run: |
-          ls -la
-          # cd tester
-          # chmod a+x cardGameTester
-          # ./cardGameTester > output.txt
-          # if grep -q "failures" output.txt; then
-          #   cat output.txt
-          #   exit 1
-          # fi
+          cd build/tester
+          chmod a+x cardGameTester
+          ./cardGameTester > output.txt
+          if grep -q "failures" output.txt; then
+            cat output.txt
+            exit 1
+          fi

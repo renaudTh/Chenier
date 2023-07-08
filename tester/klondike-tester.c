@@ -165,15 +165,10 @@ static void move_several_cards(void) {
 	}
 	klondike_game_build_moves(kg);
 	CU_ASSERT_PTR_NOT_NULL_FATAL(kg->moves_list);
-	printf("index = %d\n", kg->moves_list->index_from);
 	CU_ASSERT_EQUAL(kg->moves_list->type, BuildToBuild);
 	CU_ASSERT_EQUAL(kg->moves_list->index_from, 6);
 	klondike_game_move(kg->moves_list);
-
 	CU_ASSERT_TRUE(stack_is_empty(kg->build[1]));
-	stack_print(kg->build[0]);
-	printf("\n");
-	stack_print(kg->build[1]);
 	klondike_game_destroy(kg);
 }
 static void move_several_cards_2(void) {
@@ -184,16 +179,9 @@ static void move_several_cards_2(void) {
 	}
 	klondike_game_build_moves(kg);
 	CU_ASSERT_PTR_NOT_NULL_FATAL(kg->moves_list);
-	printf("index = %d\n", kg->moves_list->index_from);
 	CU_ASSERT_EQUAL(kg->moves_list->type, BuildToBuild);
 	CU_ASSERT_EQUAL(kg->moves_list->index_from, 6);
-	printf("before : \n");
-	stack_print(kg->build[0]);
-	printf("\n");
-	stack_print(kg->build[1]);
-	printf("\n after : \n");
 	klondike_game_move(kg->moves_list);
-
 	CU_ASSERT_EQUAL(stack_get_size(kg->build[1]), 2);
 	klondike_game_destroy(kg);
 }
