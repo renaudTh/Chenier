@@ -164,9 +164,9 @@ static void stack_iterator_test(void) {
 		i--;
 	}
 
-	it = stack_rend(s);
+	it = stack_rbegin(s);
 	i = 8;
-	while (it != stack_rbegin(s)) {
+	while (it != stack_rend(s)) {
 		CU_ASSERT_PTR_NOT_NULL(it);
 		CU_ASSERT_EQUAL(card_value(it->card), i);
 		it = stack_prev(it);
@@ -194,10 +194,10 @@ static void stack_split_test(void) {
 		CU_ASSERT_EQUAL(card_value(it->card), i);
 		i--;
 	}
-	i = 11;
+	i = 13;
 	for (StackIterator *it = stack_begin(s2); it != stack_end(s2); it = stack_next(it)) {
 		CU_ASSERT_EQUAL(card_value(it->card), i);
-		i++;
+		i--;
 	}
 	stack_destroy(s1);
 	stack_destroy(s2);

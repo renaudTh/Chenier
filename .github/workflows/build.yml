@@ -1,0 +1,29 @@
+name: Build & Test
+
+on:
+  pull_request:
+    types:
+      - synchronize
+jobs:
+  Ubuntu:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Ubuntu build
+        run: |
+          mkdir build && cd build
+          cmake ..
+          cmake --build . -j16
+      - name: Run tests
+        run: |
+          cd build/tester
+          chmod a+x cardGameTester
+          ./cardGameTester > output.txt
+          if grep -q "failures" output.txt; then
+            cat output.txt
+            exit 1
+          fi

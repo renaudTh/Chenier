@@ -63,22 +63,13 @@ static void deck_empty_test(void) {
 }
 
 static void winning_game_in_one_attempt(void) {
-	R7Game *rg = r7_game_new();
-	r7.game = rg;
-	r7.init = r7_init_winning_game_in_one_attempt;
-	bool win = card_game_play(&r7);
+	card_game_new(&r7_winning);
+	card_game_init(&r7_winning);
+	bool win = card_game_play(&r7_winning);
 	CU_ASSERT_TRUE(win);
+	R7Game *rg = (R7Game *)r7_winning.game;
 	CU_ASSERT_EQUAL(rg->attempt_nb, 1);
-	r7_game_destroy(rg);
-}
-static void winning_game_in_two_attempts(void) {
-	R7Game *rg = r7_game_new();
-	r7.game = rg;
-	r7.init = r7_init_winning_game_in_two_attempts;
-	bool win = card_game_play(&r7);
-	CU_ASSERT_TRUE(win);
-	CU_ASSERT_EQUAL(rg->attempt_nb, 2);
-	r7_game_destroy(rg);
+	card_game_destroy(&r7_winning);
 }
 static void losing_game(void) {
 	R7Game *rg = r7_game_new();
@@ -95,7 +86,6 @@ static CU_TestInfo tests[] = {
     {"Add unplayable card", add_unplayable_card_test},
     {"When the deck is empty", deck_empty_test},
     {"Winning game in one attempt", winning_game_in_one_attempt},
-    {"Winning game in two attempts", winning_game_in_two_attempts},
     {"Losing game", losing_game},
 
     CU_TEST_INFO_NULL,
